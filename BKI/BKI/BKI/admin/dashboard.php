@@ -19,6 +19,7 @@
         return $_SESSION['role'] === 'Admin';
     }
 
+
     function is_user() {
         return $_SESSION['role'] === 'User';
     }
