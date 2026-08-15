@@ -298,7 +298,7 @@
                         width: auto;
                         height: 300px;
                         object-fit: contain;
-                        margin-bottom: -50px;
+                        margin-bottom: -80px;
                         padding: 0;
                     ">
             </div>
