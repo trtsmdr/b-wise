@@ -1,10 +1,13 @@
 <?php
     session_start();
+
+    date_default_timezone_set('Asia/Jakarta');
+
     if (!isset($_SESSION['username'])) {
         header("location: Halaman_login.php");
         exit;
     }
-
+    
     $nama  = $_SESSION['nama'];
     $role  = $_SESSION['role'];
     $image = $_SESSION['image'];
@@ -26,14 +29,19 @@
     $result = mysqli_query($koneksi, "SELECT id, nup, nama, divisi FROM users WHERE status = 'Active'");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $tanggal        = date('Y-m-d');
-        $user_id        = $_SESSION['user_id'];
-        $deskripsi      = htmlspecialchars($_POST['deskripsi']);
-        $time_upload_activity_planning = htmlspecialchars($_POST['time_upload_activity_planning']);
+
+        $tanggal = date('Y-m-d');
+
+        $user_id = $_SESSION['user_id'];
+
+        $deskripsi = htmlspecialchars($_POST['deskripsi']);
+
+        $time_upload_activity_planning = date('Y-m-d H:i:s');
+
         $history_update = htmlspecialchars($_POST['history_update']);
-        
+
         $status = 'On-progress';
-        
+
         $gambar = '';
 
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] == UPLOAD_ERR_OK) {
@@ -264,9 +272,9 @@
                                                         <textarea style="height:115px" class="form-control" name="deskripsi" required></textarea>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <!-- <div class="col-6">
                                                     <input type="hidden" id="time_upload_activity_planning" name="time_upload_activity_planning" />
-                                                </div>
+                                                </div> -->
                                                 <div class="col-6">
                                                     <input type="hidden" id="status" name="status" value="On-progress" />
                                                 </div>
@@ -323,15 +331,15 @@
             }
         })
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var now = new Date();
-            var hours   = now.getHours().toString().padStart(2, '0');
-            var minutes = now.getMinutes().toString().padStart(2, '0');
-            var seconds = now.getSeconds().toString().padStart(2, '0');
-            var timeStamp = now.toISOString().split('T')[0] + ' ' + hours + ':' + minutes + ':' + seconds;
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     var now = new Date();
+        //     var hours   = now.getHours().toString().padStart(2, '0');
+        //     var minutes = now.getMinutes().toString().padStart(2, '0');
+        //     var seconds = now.getSeconds().toString().padStart(2, '0');
+        //     var timeStamp = now.toISOString().split('T')[0] + ' ' + hours + ':' + minutes + ':' + seconds;
             
-            document.getElementById('time_upload_activity_planning').value = timeStamp;
-        });
+        //     document.getElementById('time_upload_activity_planning').value = timeStamp;
+        // });
 
         $(document).ready(function() {
             $('#user_id').select2({

@@ -1,5 +1,8 @@
 <?php
     session_start();
+
+    date_default_timezone_set('Asia/Jakarta');
+
     if (!isset($_SESSION['username'])) {
         header("location: Halaman_login.php");
         exit;
