@@ -148,7 +148,7 @@ $safe_username = preg_replace('/[^A-Za-z0-9_-]/', '_', $username);
 $safe_absence_type = preg_replace('/[^A-Za-z0-9_-]/', '_', strtolower($absence_type));
 $file_extension = $allowed_mimes[$mime_type];
 
-$stored_filename = $safe_username . '_' . $safe_absence_type . '_' . date('d-m-Y', strtotime($start_date)) . '.' . $file_extension;
+$stored_filename = $safe_username . '_' . $safe_absence_type . '_' . date('dmYHis') . '.' . $file_extension;
 $target_path = $upload_dir . $stored_filename;
 
 if (!move_uploaded_file($file_tmp, $target_path)) {
@@ -204,6 +204,9 @@ foreach ($period as $date_item) {
 unset($_SESSION['login_latitude'], $_SESSION['login_longitude']);
 session_destroy();
 
-header("Location: http://localhost:8888/b-wise/index.php");
+$document_root = realpath($_SERVER['DOCUMENT_ROOT']);
+$project_root = realpath(__DIR__ . '/../../../..');
+$relative_path = str_replace('\\', '/', str_replace($document_root, '', $project_root));
+header("Location: " . rtrim($relative_path, '/') . "/index.php");
 exit;
 ?>

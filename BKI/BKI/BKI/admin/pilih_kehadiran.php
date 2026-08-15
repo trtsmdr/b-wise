@@ -223,7 +223,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
 
         const startDate = document.getElementById('start_date');
         const endDate = document.getElementById('end_date');
-        const today = new Date().toISOString().split('T')[0];
+        const today = '<?php echo date('Y-m-d'); ?>';
 
         startDate.min = today;
         endDate.min = today;
