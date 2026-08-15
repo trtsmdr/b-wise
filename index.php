@@ -55,7 +55,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>BKI - Bara Page</title>
+    <title>BKI - Landing Page</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -105,7 +105,7 @@
             <div class="col-lg-20">
                 <h2> BIRO KLASIFIKASI </h2> 
                   <h2>INDONESIA ( PERSERO )</h2>
-                <p><span class="typed" data-typed-items="BKI Workload & Individual Staff Efficiency, JAKARTA MAIN COMMERCIAL BRANCH"></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true"></span></p>
+                <p><span class="typed" data-typed-items="BKI Workload and Individual Staff Efficiency, JAKARTA MAIN COMMERCIAL BRANCH"></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true"></span></p>
               </div>
             </div>
         </div>
@@ -186,20 +186,33 @@
     </main>
 
     <footer id="footer" class="footer feedback section-2 position-relative light-background">
-        <div class="container aos-init aos-animate">
-            <div class="row gy-4"  data-aos="fade-up" data-aos-delay="200">
+        <div class="container">
+            <div class="row gy-4" data-aos="fade-up" data-aos-delay="200">
+
+                <!-- Left Content -->
                 <div class="col-lg-6">
-                    <h3 class="sitename">B-WISE</h3>
-                    <p class="text-start">If you run into any issues or have further questions, please feel free to send a feedback form or contact IT team. Good luck!</p>
-                    <div class="info-item d-flex aos-init aos-animate" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="sitename">B - WISE</h3>
+
+                    <p class="text-start">
+                        If you run into any issues or have further questions,
+                        please feel free to send a feedback form or contact IT team.
+                        Good luck!
+                    </p>
+
+                    <div class="info-item d-flex">
                         <i class="bi bi-geo-alt flex-shrink-0"></i>
                         <div class="text-start">
                             <h3>Address</h3>
                             <p class="fw-bold">PT Biro Klasifikasi Indonesia (Persero)</p>
-                            <p>Jalan Yos Sudarso No.38 - 40, RT.04/RW.10 Kelurahan Kebon Bawang, Kecamatan Tanjung Priok Kota Jakarta Utara, DKI Jakarta, 14320.</p>
+                            <p>
+                                Jalan Yos Sudarso No.38 - 40, RT.04/RW.10
+                                Kelurahan Kebon Bawang, Kecamatan Tanjung Priok,
+                                Kota Jakarta Utara, DKI Jakarta, 14320.
+                            </p>
                         </div>
                     </div>
-                    <div class="info-item d-flex aos-init aos-animate" data-aos="fade-up" data-aos-delay="300">
+
+                    <div class="info-item d-flex">
                         <i class="bi bi-telephone flex-shrink-0"></i>
                         <div class="text-start">
                             <h3>Telp</h3>
@@ -207,63 +220,90 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-1">
+
+                <!-- Spacer -->
+                <div class="col-lg-1"></div>
+
+                <!-- Feedback -->
+                <div class="col-lg-5" style="text-align: end;">
+                    <div class="container section-title"
+                        style="margin-bottom: 5px; padding-bottom: 5px;">
+                        <h2>Feedback</h2>
                     </div>
-                        <div class="col-lg-5" style="text-align: end;">
-                        <div class="container section-title aos-init aos-animate" data-aos="fade-up" style="margin-bottom: 5px; padding-bottom: 5px;">
-                            <h2>Feedback</h2>
-                        </div>
-                        <form action="" method="POST">
-                            <div class="row gy-4">
-                                <div class="col-md-6 php-email-form">
-                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
-                                </div>
-                                <div class="col-md-6 php-email-form">
-                                    <input type="email" name="email" class="form-control" placeholder="Your Email" required>
-                                </div>
-                                <div class="col-md-12 php-email-form">
-                                    <input type="text" name="subject" class="form-control" placeholder="Subject" required>
-                                </div>
-                                <div class="col-md-12 php-email-form">
-                                    <textarea name="message" class="form-control" placeholder="Message" rows="6" required></textarea>
-                                </div>
-                                <div class="col-md-12 text-center php-email-form">
-                                    <button type="submit" name="feedback" class="btn btn-primary_2 me-1">Send</button>
-                                </div>
+
+                    <form action="" method="POST">
+                        <div class="row gy-4">
+
+                            <div class="col-md-6 php-email-form">
+                                <input type="text"
+                                    name="name"
+                                    class="form-control"
+                                    placeholder="Your Name"
+                                    required>
                             </div>
-                        </form>
-                    </div>
-                          
-<div style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 35px;
-    width: 100%;
-">
 
-    <!-- Logo Footer -->
-    <div style="
-        width: 150px;
-        height: 250px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    ">
-        <img src="BKI/assets/img/ChatGPT Image Aug 9, 2026 at 07_22_07 PM.png"
-             style="
-                max-width: 300%;
-                max-height: 300%;
-                width: auto;
-                height: auto;
-                object-fit: contain;
-             ">
-    </div>
+                            <div class="col-md-6 php-email-form">
+                                <input type="email"
+                                    name="email"
+                                    class="form-control"
+                                    placeholder="Your Email"
+                                    required>
+                            </div>
 
+                            <div class="col-md-12 php-email-form">
+                                <input type="text"
+                                    name="subject"
+                                    class="form-control"
+                                    placeholder="Subject"
+                                    required>
+                            </div>
 
-</div>
-   </div>
-          </div
+                            <div class="col-md-12 php-email-form">
+                                <textarea name="message"
+                                        class="form-control"
+                                        placeholder="Message"
+                                        rows="6"
+                                        required></textarea>
+                            </div>
+
+                            <div class="col-md-12 text-center php-email-form">
+                                <button type="submit"
+                                        name="feedback"
+                                        class="btn btn-primary_2 me-1">
+                                    Send
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Logo Footer -->
+            <div class="footer-logo"
+                style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    margin-top: 5px;
+                    margin-bottom: 0;
+                    padding: 0;
+                ">
+
+                <img src="BKI/assets/img/ChatGPT Image Aug 9, 2026 at 07_22_07 PM.png"
+                    style="
+                        display: block;
+                        width: auto;
+                        height: 300px;
+                        object-fit: contain;
+                        margin-bottom: -50px;
+                        padding: 0;
+                    ">
+            </div>
+
+        </div>
     </footer>
 
     <!-- Scroll Top -->
