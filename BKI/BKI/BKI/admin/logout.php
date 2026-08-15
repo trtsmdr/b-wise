@@ -4,7 +4,7 @@
 
     date_default_timezone_set('Asia/Jakarta');
 
-    if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'user') {
+    if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'User') {
         $user_id   = $_SESSION['user_id'];
         $tanggal   = date('Y-m-d');
         $time_logout = date('H:i:s');

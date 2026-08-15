@@ -221,6 +221,7 @@
                                                         <option value="HSE" <?= $row['divisi'] === 'HSE' ? 'selected' : '' ?>>HSE</option>
                                                         <option value="Finance" <?= $row['divisi'] === 'Finance' ? 'selected' : '' ?>>Finance</option>
                                                         <option value="Marketing" <?= $row['divisi'] === 'Marketing' ? 'selected' : '' ?>>Marketing</option>
+                                                        <option value="IT" <?= $row['divisi'] === 'IT' ? 'selected' : '' ?>>IT</option>
                                                     </select>
                                                 </div>
                                             </div>

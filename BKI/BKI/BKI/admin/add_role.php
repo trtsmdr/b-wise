@@ -200,7 +200,7 @@
                                                         <option value="HSE">HSE</option>
                                                         <option value="Finance">Finance</option>
                                                         <option value="Marketing">Marketing</option>
-                                                       <option value="Marketing">IT</option>
+                                                       <option value="IT">IT</option>
                                                     </select>
                                                 </div>
                                             </div>

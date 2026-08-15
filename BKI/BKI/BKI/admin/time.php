@@ -32,12 +32,14 @@
     }
 
     $query = "
-        SELECT p.id, p.tanggal, p.time_login, p.geotagging, p.before_break, p.geotagging_before_break, p.after_break, p.geotagging_after_break, p.time_logout, p.geotagging_logout, 
+        SELECT p.id, p.tanggal, p.time_login, p.geotagging, p.before_break, p.geotagging_before_break, p.after_break, p.geotagging_after_break, p.time_logout, p.geotagging_logout,
+        p.time_off_id, t.absence_type, t.start_date, t.end_date, t.evidence, t.description,
         u.nup, u.nama, u.divisi
         FROM time p
         JOIN users u ON p.user_id = u.id
-        WHERE u.status = 'active' 
-        AND MONTH(p.tanggal) = '$selected_month' 
+        LEFT JOIN time_off t ON p.time_off_id = t.id
+        WHERE u.status = 'active'
+        AND MONTH(p.tanggal) = '$selected_month'
         AND YEAR(p.tanggal) = '$selected_year'
     ";
 
@@ -238,7 +240,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-hover-animation" style="min-width: 2000px;">
+                                <table class="table table-hover-animation" style="min-width: 2200px;">
                                     <thead>
                                         <tr style="text-align: center;">
                                             <th style="min-width: 50px;">No.</th>
@@ -246,6 +248,8 @@
                                             <th style="min-width: 200px;">NUP</th>
                                             <th style="min-width: 350px;">Name</th>
                                             <th style="min-width: 150px;">Division</th>
+                                            <th style="min-width: 180px;">Absence Type</th>
+                                            <th style="min-width: 120px;">Absence Detail</th>
                                             <th style="min-width: 100px;">Login Time</th>
                                             <th style="min-width: 100px;">Before Break</th>
                                             <th style="min-width: 100px;">After Break</th>
@@ -257,11 +261,62 @@
                                         $i = 1;
                                         if ($result->num_rows > 0) {
                                             while ($row = $result->fetch_assoc()) {
+                                                $is_time_off = !empty($row['time_off_id']);
                                                 $time_logout_display = $row['time_logout'] ? htmlspecialchars($row['time_logout']) : date('H:i:s');
                                                 $geotagging = htmlspecialchars($row['geotagging'] ?? ''); 
                                                 $geotagging_array = explode(',', $geotagging);
                                                 $latitude   = $geotagging_array[0] ?? '';
                                                 $longitude  = $geotagging_array[1] ?? '';
+                                                $absence_label = '-';
+                                                if (!empty($row['absence_type'])) {
+                                                    $absence_label = htmlspecialchars($row['absence_type']);
+                                                }
+
+                                                $detail_html = '-';
+                                                if ($is_time_off) {
+                                                    $absence_type_attr = htmlspecialchars($row['absence_type'] ?? '-', ENT_QUOTES, 'UTF-8');
+                                                    $start_date_attr = !empty($row['start_date']) ? date('d-m-Y', strtotime($row['start_date'])) : '-';
+                                                    $end_date_attr = !empty($row['end_date']) ? date('d-m-Y', strtotime($row['end_date'])) : '-';
+                                                    $description_attr = htmlspecialchars($row['description'] ?? '-', ENT_QUOTES, 'UTF-8');
+                                                    if ($description_attr === '') {
+                                                        $description_attr = '-';
+                                                    }
+
+                                                    $evidence_link_attr = '-';
+                                                    $evidence_name_attr = '-';
+                                                    if (!empty($row['evidence'])) {
+                                                        $safe_evidence = htmlspecialchars($row['evidence'], ENT_QUOTES, 'UTF-8');
+                                                        $evidence_link_attr = 'img/time_off/' . $safe_evidence;
+                                                        $evidence_name_attr = $safe_evidence;
+                                                    }
+
+                                                    $detail_html = "
+                                                        <button
+                                                            type='button'
+                                                            class='btn btn-sm btn-outline-primary view-detail-btn'
+                                                            data-bs-toggle='modal'
+                                                            data-bs-target='#timeOffDetailModal'
+                                                            data-absence-type='{$absence_type_attr}'
+                                                            data-start-date='{$start_date_attr}'
+                                                            data-end-date='{$end_date_attr}'
+                                                            data-evidence-link='{$evidence_link_attr}'
+                                                            data-evidence-name='{$evidence_name_attr}'
+                                                            data-description='{$description_attr}'
+                                                            title='View detail'
+                                                        >
+                                                            <i class='fa fa-eye'></i>
+                                                        </button>
+                                                    ";
+                                                }
+
+                                                $logout_class = 'inactive';
+                                                if (!$is_time_off && empty($row['time_logout'])) {
+                                                    $logout_class = 'active';
+                                                }
+
+                                                $login_display = $is_time_off ? '-' : htmlspecialchars($row['time_login'] ?? '');
+                                                $before_break_display = $is_time_off ? '-' : htmlspecialchars($row['before_break'] ?? '');
+                                                $after_break_display = $is_time_off ? '-' : htmlspecialchars($row['after_break'] ?? '');
                                                 echo "
                                                 <tr>
                                                     <td>{$i}</td>
@@ -269,29 +324,36 @@
                                                     <td>" . htmlspecialchars($row['nup'] ?? '') . "</td>
                                                     <td>" . htmlspecialchars($row['nama'] ?? '') . "</td>
                                                     <td>" . htmlspecialchars($row['divisi'] ?? '') . "</td>
-                                                    <td>";
-                                                if (!empty($row['geotagging'])) {
+                                                    <td>{$absence_label}</td>
+                                                    <td>{$detail_html}</td>
+                                                    <td>{$login_display}";
+                                                if (!$is_time_off && !empty($row['geotagging'])) {
                                                     echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($row['time_login'] ?? '') . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
                                                 echo "</td>
-                                                    <td>";
-                                                if (!empty($row['geotagging_before_break'])) {
+                                                    <td>{$before_break_display}";
+                                                if (!$is_time_off && !empty($row['geotagging_before_break'])) {
                                                     echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($row['before_break'] ?? '') . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
                                                 echo "</td>
-                                                    <td>";
-                                                if (!empty($row['geotagging_after_break'])) {
+                                                    <td>{$after_break_display}";
+                                                if (!$is_time_off && !empty($row['geotagging_after_break'])) {
                                                     echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($row['after_break'] ?? '') . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
                                                 echo "</td>
-                                                    <td id='logout-time-{$row['id']}' class='" . ($row['time_logout'] ? 'inactive' : 'active') . "'>";
-                                                if (!empty($row['geotagging_logout'])) {
+                                                    <td id='logout-time-{$row['id']}' class='{$logout_class}'>";
+                                                if ($is_time_off) {
+                                                    echo "-";
+                                                } elseif (!empty($row['time_logout'])) {
+                                                    echo htmlspecialchars($row['time_logout']);
+                                                }
+                                                if (!$is_time_off && !empty($row['geotagging_logout'])) {
                                                     echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($time_logout_display) . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
@@ -325,6 +387,24 @@
                                 </div>
                                 <div class="modal-body">
                                     <div id="map" style="height: 500px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="timeOffDetailModal" tabindex="-1" aria-labelledby="timeOffDetailModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="timeOffDetailModalLabel">Absence Detail</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-1"><strong>Absence Type:</strong> <span id="detail-absence-type">-</span></div>
+                                    <div class="mb-1"><strong>Date Range:</strong> <span id="detail-date-range">-</span></div>
+                                    <div class="mb-1"><strong>Evidence:</strong> <div id="detail-evidence" class="mt-1">-</div></div>
+                                    <div class="mb-1"><strong>Description:</strong></div>
+                                    <div id="detail-description">-</div>
                                 </div>
                             </div>
                         </div>
@@ -496,6 +576,29 @@
                 L.marker([lat, lng]).addTo(map)
                     .bindPopup(`Time: ${time}`)
                     .openPopup();
+            });
+
+            const detailModal = document.getElementById('timeOffDetailModal');
+            detailModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const absenceType = button.getAttribute('data-absence-type') || '-';
+                const startDate = button.getAttribute('data-start-date') || '-';
+                const endDate = button.getAttribute('data-end-date') || '-';
+                const evidenceLink = button.getAttribute('data-evidence-link') || '-';
+                const evidenceName = button.getAttribute('data-evidence-name') || '-';
+                const description = button.getAttribute('data-description') || '-';
+
+                document.getElementById('detail-absence-type').textContent = absenceType;
+                document.getElementById('detail-date-range').textContent = startDate + ' to ' + endDate;
+
+                const evidenceContainer = document.getElementById('detail-evidence');
+                if (evidenceLink !== '-' && evidenceName !== '-') {
+                    evidenceContainer.innerHTML = '<a href="' + evidenceLink + '" target="_blank">' + evidenceName + '</a>';
+                } else {
+                    evidenceContainer.textContent = '-';
+                }
+
+                document.getElementById('detail-description').textContent = description;
             });
         });
     </script>

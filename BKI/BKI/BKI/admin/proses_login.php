@@ -14,8 +14,8 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
-$username  = $_POST['username'];
-$password  = $_POST['password'];
+$username  = isset($_POST['username']) ? trim($_POST['username']) : '';
+$password  = isset($_POST['password']) ? $_POST['password'] : '';
 $latitude  = isset($_POST['latitude']) ? $_POST['latitude'] : null;
 $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : null;
 
@@ -39,18 +39,22 @@ if (mysqli_num_rows($result) > 0) {
             $_SESSION['role'] = $_SESSION['roles'][0];
         }
 
-        $user_id = $_SESSION['user_id'];
-        $tanggal = date('Y-m-d');
-        $time_login = date('H:i:s');
-        $geotagging = $latitude && $longitude ? $latitude . ',' . $longitude : '';
-
         if ($_SESSION['role'] === 'User') {
-            $check_query  = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal'";
+            $user_id = (int) $_SESSION['user_id'];
+            $tanggal = date('Y-m-d');
+            $time_login = date('H:i:s');
+
+            $is_valid_geo = is_numeric($latitude) && is_numeric($longitude)
+                && $latitude >= -90 && $latitude <= 90
+                && $longitude >= -180 && $longitude <= 180;
+            $geotagging = $is_valid_geo ? ($latitude . ',' . $longitude) : '';
+
+            $check_query  = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal' LIMIT 1";
             $check_result = mysqli_query($koneksi, $check_query);
         
             if (mysqli_num_rows($check_result) > 0) {
                 $row = mysqli_fetch_assoc($check_result);
-                if ($row['is_break'] == true) {
+                if ((int) $row['is_break'] === 1 && empty($row['after_break'])) {
                     $update_query = "UPDATE time SET after_break = '$time_login', geotagging_after_break = '$geotagging', is_break = false WHERE user_id = $user_id AND tanggal = '$tanggal'";
                     if (!mysqli_query($koneksi, $update_query)) {
                         die("Error updating record: " . mysqli_error($koneksi));
@@ -84,36 +88,30 @@ if (mysqli_num_rows($result) > 0) {
                             </html>";
                         exit;
                 }
-            } else {
-                $batas_waktu = strtotime('08:00:00');
-                $waktu_login = strtotime($time_login);
-        
-                if ($waktu_login > $batas_waktu) {
-                    $_SESSION['telat'] = true;
-                    $selisih     = $waktu_login - $batas_waktu;
-                    $menit_telat = floor($selisih / 60);
-                    $jam_telat   = floor($menit_telat / 60);
-                    $sisa_menit_telat = $menit_telat % 60;
-                    $detik_telat = $selisih % 60;
-        
-                    if ($jam_telat > 0) {
-                        $_SESSION['telat_waktu'] = "$jam_telat hours $sisa_menit_telat minutes $detik_telat seconds late!";
-                    } elseif ($sisa_menit_telat > 0) {
-                        $_SESSION['telat_waktu'] = "$sisa_menit_telat minutes $detik_telat seconds late!";
-                    } else {
-                        $_SESSION['telat_waktu'] = "$detik_telat seconds late!";
-                    }
-                    $status = 'Late';
-                } else {
-                    $_SESSION['telat'] = false;
-                    $status = 'On-time';
-                }
-                $insert_query = "INSERT INTO time (tanggal, user_id, time_login, geotagging, status) VALUES ('$tanggal', $user_id, '$time_login', '$geotagging', '$status')";
-                if (!mysqli_query($koneksi, $insert_query)) {
-                    die("Error inserting record: " . mysqli_error($koneksi));
-                }
-                $_SESSION['first_login'] = true;
+
+                header("location: dashboard.php");
+                exit;
             }
+
+            $check_time_off_query = "
+                SELECT id
+                FROM time_off
+                WHERE user_id = $user_id
+                AND '$tanggal' BETWEEN start_date AND end_date
+                LIMIT 1
+            ";
+            $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+            if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+                header("location: dashboard.php");
+                exit;
+            }
+
+            $_SESSION['login_latitude'] = $is_valid_geo ? $latitude : '';
+            $_SESSION['login_longitude'] = $is_valid_geo ? $longitude : '';
+
+            header("location: pilih_kehadiran.php");
+            exit;
         }
 
         header("location: dashboard.php");

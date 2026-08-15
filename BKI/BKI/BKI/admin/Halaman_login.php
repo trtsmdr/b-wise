@@ -6,6 +6,7 @@
     }
 
     $error = isset($_GET['error']) ? $_GET['error'] : '';
+    $success = isset($_GET['success']) ? $_GET['success'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +81,18 @@
                                     <div class="alert alert-danger">
                                         Invalid username or password.
                                     </div>
+                                <?php elseif ($error === 'session_expired'): ?>
+                                    <div class="alert alert-warning">
+                                        Session expired. Please login again.
+                                    </div>
                                 <?php endif; ?>
+
+                                <?php if ($success === 'time_off_submitted'): ?>
+                                    <div class="alert alert-success">
+                                        Your application has been submitted successfully.
+                                    </div>
+                                <?php endif; ?>
+
                                 <form class="auth-login-form mt-2" action="proses_login.php" method="POST">
                                     <div class="mb-1">
                                         <label for="username" class="form-label">Username</label>
