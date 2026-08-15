@@ -136,21 +136,18 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
                                 <label class="option-card active w-100" id="card-masuk">
                                     <input type="radio" name="attendance_type" value="masuk" checked class="d-none">
                                     <div class="fw-bolder">Check In</div>
-                                    <small>Continue normal activity</small>
                                 </label>
                             </div>
                             <div class="col-md-4">
                                 <label class="option-card w-100" id="card-sakit">
                                     <input type="radio" name="attendance_type" value="Sick" class="d-none">
                                     <div class="fw-bolder">Sick</div>
-                                    <small>Save to Time Off data</small>
                                 </label>
                             </div>
                             <div class="col-md-4">
                                 <label class="option-card w-100" id="card-cuti">
                                     <input type="radio" name="attendance_type" value="Permission/Leave" class="d-none">
                                     <div class="fw-bolder">Permission/Leave</div>
-                                    <small>Save to Time Off data</small>
                                 </label>
                             </div>
                         </div>
