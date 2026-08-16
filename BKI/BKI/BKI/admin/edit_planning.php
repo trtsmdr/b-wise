@@ -147,7 +147,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="#">
-                        <h2 class="brand-text" style="font-size: 20px;">BKI</h2>
+                        <h2 class="brand-text" style="font-size: 20px;">B - WISE</h2>
                         <hr>
                     </a>
                 </li>
@@ -164,7 +164,7 @@
                             </li>
                             <li class="active"><a class="d-flex align-items-center" href="planning.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Planning">Planning</span></a>
                             </li>
-                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Avident">Evident</span></a>
+                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Evidence">Evidence</span></a>
                             </li>
                         </ul>
                     </li><br>
@@ -247,7 +247,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->

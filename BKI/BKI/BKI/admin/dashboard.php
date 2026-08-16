@@ -482,7 +482,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="#">
-                        <h1 class="brand-text" style="font-size: 20px;">BKI</h1>
+                        <h1 class="brand-text" style="font-size: 20px;">B - WISE</h1>
                         <hr>
                     </a>
                 </li>
@@ -903,7 +903,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->

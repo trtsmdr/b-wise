@@ -79,7 +79,6 @@
     $query .= " ORDER BY p.time_upload_avident ASC";
     
     $result = mysqli_query($koneksi, $query);
-
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +93,7 @@
     <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
-    <title>BKI - Evident</title>
+    <title>BKI - Evidence</title>
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
@@ -176,7 +175,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="#">
-                        <h2 class="brand-text" style="font-size: 20px;">BKI</h2>
+                        <h2 class="brand-text" style="font-size: 20px;">B - WISE</h2>
                         <hr>
                     </a>
                 </li>
@@ -193,7 +192,7 @@
                             </li>
                             <li><a class="d-flex align-items-center" href="planning.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Planning">Planning</span></a>
                             </li>
-                            <li class="active"><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Avident">Evidence</span></a>
+                            <li class="active"><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Evidence">Evidence</span></a>
                             </li>
                         </ul>
                     </li><br>
@@ -279,9 +278,9 @@
                                             <th style="min-width: 250px;">Image</th>
                                             <th style="min-width: 250px;">Description</th>
                                             <th style="min-width: 150px;">Upload Time</th>
-                                            <th style="min-width: 150px;">Collection Duration</th>
-                                            <?php if (is_superadmin() || is_user()): ?>
+                                            <th style="min-width: 200px;">Collection Duration</th>
                                             <th style="min-width: 150px;">Status</th>
+                                            <?php if (is_superadmin()): ?>
                                             <th style="min-width: 250px;">Action</th>
                                             <?php endif; ?>
                                         </tr>
@@ -344,29 +343,33 @@
                                                 ?>
                                             </td>
                                             <?php if (is_superadmin() || is_user()): ?>
-                                          
-                                                <td>
-                                                <?php if ($is_warning):   ?>
+                                            <td>
+                                                <?php if ($is_warning): ?>
                                                     <button class="btn btn-sm btn-warning" onclick="showLateAlert()">
                                                         <i class="fas fa-exclamation-triangle"></i>
                                                     </button>
-                                                    
-                                                <?php elseif ($is_upload): ?>
-                                                    <a href="edit_avident.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-primary_4">Upload</a>
 
-                                                <?php elseif ($is_done):      ?>
+                                                <?php elseif ($is_upload): ?>
+                                                    <a href="edit_avident.php?id=<?php echo $row['id']; ?>" 
+                                                    class="btn btn-sm btn-primary_4">
+                                                        Upload
+                                                    </a>
+
+                                                <?php elseif ($is_done): ?>
                                                     <span class="badge bg-success">Done</span>
-                                                 
                                                 <?php endif; ?>
-                                          </td>
-                                         <td>
+                                            </td>
+                                                <?php endif; ?>
+
                                                 <?php if (is_superadmin()): ?>
-                                                    <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $row['id']; ?>); return false;">Delete</a>
-                                                <?php endif; ?>
-                                          </td>
-                                          <td>
+                                            <td>
+                                                <a href="#" 
+                                                class="btn btn-sm btn-danger" 
+                                                onclick="confirmDelete(<?php echo $row['id']; ?>); return false;">
+                                                    Delete
+                                                </a>
+                                            </td>
                                             <?php endif; ?>
-                                          </td>
                                         </tr>
                                         <?php } ?>
                                     </tbody>
@@ -393,7 +396,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->

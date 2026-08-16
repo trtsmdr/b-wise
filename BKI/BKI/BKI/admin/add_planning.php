@@ -192,7 +192,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="#">
-                        <h2 class="brand-text" sytle="font-size: 20px;">BKI</h2>
+                        <h2 class="brand-text" sytle="font-size: 20px;">B - WISE</h2>
                         <hr>
                     </a>
                 </li>
@@ -233,7 +233,7 @@
             <div class="content-header row">
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
-                        <h2 class="float-start mb-0">Add - Form Planning</h2>
+                        <h2 class="float-start mb-0">Form Planning</h2>
                     </div>
                 </div>
             </div>
@@ -258,7 +258,7 @@
                                                     <input type="hidden" id="user_id" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
                                                 <?php else: ?>
                                                     <select class="form-control select2" id="user_id" name="user_id" required>
-                                                        <option value="">Select User..</option>
+                                                        <option value="">Select User</option>
                                                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                                             <option value="<?php echo $row['id']; ?>"><?php echo $row['nup']; ?> - <?php echo $row['nama']; ?> - <?php echo $row['divisi']; ?></option>
                                                         <?php endwhile; ?>
@@ -269,7 +269,7 @@
                                                 <div class="col-6">
                                                     <div class="mb-1">
                                                         <label for="deskripsi" class="form-label">Description</label>
-                                                        <textarea style="height:115px" class="form-control" name="deskripsi" required></textarea>
+                                                        <textarea id ="deskripsi" style="height:115px" class="form-control" name="deskripsi" required></textarea>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="col-6">
@@ -303,7 +303,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->

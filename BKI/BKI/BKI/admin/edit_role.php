@@ -157,7 +157,7 @@
                             </li>
                             <li><a class="d-flex align-items-center" href="planning.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Planning">Planning</span></a>
                             </li>
-                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Avident">Avident</span></a>
+                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Evidence">Evidence</span></a>
                             </li>
                         </ul>
                     </li><br>
@@ -202,7 +202,7 @@
                                             <div class="col-6">
                                                 <div class="mb-1">
                                                     <label for="nup" class="form-label">NUP</label>
-                                                    <input type="text" class="form-control" name="nup" placeholder="Number ..." value="<?=$row['nup'] ?>" required />
+                                                    <input type="text" class="form-control" name="nup" placeholder="Number" value="<?=$row['nup'] ?>" required />
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -268,7 +268,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->
