@@ -235,8 +235,12 @@
                                     </select>
                                     <label for="entriesSelect" class="ms-2">entries</label>
                                 </div>
-                                <div>
-                                    <input type="text" id="searchInput" placeholder="Search..." class="form-control search-input" style="width: 220px;" onkeyup="searchTable()">
+                                <div class="d-flex flex-column align-items-end">
+                                    <input type="text" id="searchInput" placeholder="Search..." class="form-control search-input mb-2" style="width: 220px;" onkeyup="searchTable()">
+                                    <div class="d-flex gap-2">
+                                        <a href="export_time.php?type=monthly&month=<?php echo urlencode($selected_month); ?>&year=<?php echo urlencode($selected_year); ?>" class="btn btn-outline-secondary"><i data-feather="download"></i> Monthly Export</a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#periodExportModal"><i data-feather="download"></i> Period Export</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -406,6 +410,34 @@
                                     <div class="mb-1"><strong>Description:</strong></div>
                                     <div id="detail-description">-</div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="periodExportModal" tabindex="-1" aria-labelledby="periodExportModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="periodExportModalLabel">Period Export</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="export_time.php" method="GET" id="periodExportForm">
+                                    <input type="hidden" name="type" value="period">
+                                    <div class="modal-body">
+                                        <div class="mb-2">
+                                            <label for="start_date" class="form-label">Start Date</label>
+                                            <input type="date" name="start_date" id="start_date" class="form-control" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="end_date" class="form-label">End Date</label>
+                                            <input type="date" name="end_date" id="end_date" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary"><i data-feather="download"></i> Export</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -696,6 +728,27 @@
         }
 
         setInterval(checkTime, 1000);
+
+        document.addEventListener('DOMContentLoaded', function() {
+        const periodExportForm = document.getElementById('periodExportForm');
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+
+        periodExportForm.addEventListener('submit', function(e) {
+            if (startDate.value && endDate.value && startDate.value > endDate.value) {
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date Range',
+                    text: 'Start date cannot be greater than end date',
+                    confirmButtonText: 'OK'
+                });
+
+                return false;
+            }
+        });
+    });
     </script>
 
 </body>
