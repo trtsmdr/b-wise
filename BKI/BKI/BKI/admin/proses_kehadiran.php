@@ -69,14 +69,28 @@ if ($attendance_type === 'masuk') {
     ";
 
     if (!mysqli_query($koneksi, $insert_time_query)) {
-        die("Error inserting time: " . mysqli_error($koneksi));
+        $_SESSION['attendance_alert'] = [
+            'icon' => 'error',
+            'title' => 'Check In failed!',
+            'text' => 'Please try again.'
+        ];
+
+        header("Location: pilih_kehadiran.php");
+        exit;
     }
 
     unset($_SESSION['login_latitude'], $_SESSION['login_longitude']);
 
-    header("Location: dashboard.php");
+    $_SESSION['attendance_alert'] = [
+        'icon' => 'success',
+        'title' => 'Check In successful!',
+        'text' => 'Your attendance has been recorded successfully.',
+        'redirect' => 'dashboard.php'
+    ];
+
+    header("Location: pilih_kehadiran.php");
     exit;
-}
+    }
 
     if ($attendance_type !== 'Sick' && $attendance_type !== 'Permission/Leave') {
         header("Location: pilih_kehadiran.php");
@@ -169,9 +183,16 @@ if ($attendance_type === 'masuk') {
         VALUES ($user_id, '$absence_type', '$start_date', '$end_date', '$evidence_for_db', $description_sql)
     ";
 
-    if (!mysqli_query($koneksi, $insert_time_off_query)) {
-        die("Error inserting time_off: " . mysqli_error($koneksi));
-    }
+if (!mysqli_query($koneksi, $insert_time_off_query)) {
+    $_SESSION['attendance_alert'] = [
+        'icon' => 'error',
+        'title' => 'Submission failed!',
+        'text' => 'Unable to submit your attendance. Please try again.'
+    ];
+
+    header("Location: pilih_kehadiran.php");
+    exit;
+}
 
     $time_off_id = mysqli_insert_id($koneksi);
 
@@ -247,11 +268,22 @@ if ($attendance_type === 'masuk') {
     }
 
     unset($_SESSION['login_latitude'], $_SESSION['login_longitude']);
-    session_destroy();
 
     $document_root = realpath($_SERVER['DOCUMENT_ROOT']);
     $project_root = realpath(__DIR__ . '/../../../..');
     $relative_path = str_replace('\\', '/', str_replace($document_root, '', $project_root));
-    header("Location: " . rtrim($relative_path, '/') . "/index.php");
+
+    $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+
+    $_SESSION['attendance_alert'] = [
+        'icon' => 'success',
+        'title' => $absence_type === 'Sick'
+            ? 'Sick submission successful!'
+            : 'Permission/Leave submission successful!',
+        'text' => 'Your submission has been recorded successfully.',
+        'redirect' => $base_url . rtrim($relative_path, '/') . '/index.php'
+    ];
+
+    header("Location: pilih_kehadiran.php");
     exit;
 ?>

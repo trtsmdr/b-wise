@@ -199,6 +199,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
 
     <!-- BEGIN: Page JS-->
     <script src="../../../app-assets/js/scripts/pages/page-auth-login.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- END: Page JS-->
 
     <script>
@@ -210,14 +211,57 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                 });
             }
         })
-    </script>
-    <script>
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById('latitude').value = position.coords.latitude;
-            document.getElementById('longitude').value = position.coords.longitude;
+
+        const loginForm = document.querySelector('.auth-login-form');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+
+        let locationAllowed = false;
+
+        function getLocation() {
+            if (!navigator.geolocation) {
+                locationAllowed = false;
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    latitudeInput.value = position.coords.latitude;
+                    longitudeInput.value = position.coords.longitude;
+                    locationAllowed = true;
+                },
+                function(error) {
+                    locationAllowed = false;
+                    latitudeInput.value = '';
+                    longitudeInput.value = '';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        getLocation();
+
+        loginForm.addEventListener('submit', function(e) {
+            if (!latitudeInput.value || !longitudeInput.value || !locationAllowed) {
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Location Required',
+                    text: 'Please enable your location permission before logging in.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false
+                }).then(function() {
+                    getLocation();
+                });
+
+                return;
+            }
         });
-    }
     </script>
     
 </body>

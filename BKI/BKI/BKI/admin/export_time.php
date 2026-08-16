@@ -24,15 +24,20 @@ $nama = $_SESSION['nama'];
 
 $type = $_GET['type'] ?? '';
 
-if (!in_array($type, ['monthly', 'period'], true)) {
+if (!in_array($type, ['monthly', 'period', 'all'], true)) {
     die('Invalid export type.');
 }
 
 $spreadsheet = new Spreadsheet();
+
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle('Time Export');
 
+$summarySheet = null;
+
 $where = '';
+$periodText = '';
+$title = '';
 
 if ($type === 'monthly') {
 
@@ -81,10 +86,23 @@ if ($type === 'monthly') {
     $title = 'Employee Time Export - Period';
 
     $filename = 'time_' . $startDate . '_to_' . $endDate . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+} elseif ($type === 'all') {
+
+    $where = '';
+
+    $periodText = 'All Data';
+
+    $title = 'Employee Time Export - All Data';
+
+    $filename = 'time_all_' . date('Y-m-d_H-i-s') . '.xlsx';
 }
 
 // Super Admin
 if ($role === 'Super-Admin') {
+
+    $summarySheet = $spreadsheet->createSheet();
+    $summarySheet->setTitle('Summary');
 
     $headers = [
         'Name',
@@ -97,29 +115,29 @@ if ($role === 'Super-Admin') {
 
     $lastColumn = 'F';
 
-    $sheet->mergeCells('A1:' . $lastColumn . '1');
-    $sheet->setCellValue('A1', $title);
+    $summarySheet->mergeCells('A1:' . $lastColumn . '1');
+    $summarySheet->setCellValue('A1', $title);
 
-    $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-    $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    $summarySheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+    $summarySheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $summarySheet->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-    $sheet->getRowDimension(1)->setRowHeight(30);
+    $summarySheet->getRowDimension(1)->setRowHeight(30);
 
-    $sheet->mergeCells('A2:' . $lastColumn . '2');
-    $sheet->setCellValue('A2', $periodText);
+    $summarySheet->mergeCells('A2:' . $lastColumn . '2');
+    $summarySheet->setCellValue('A2', $periodText);
 
-    $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle('A2')->getFont()->setItalic(true);
+    $summarySheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+    $summarySheet->getStyle('A2')->getFont()->setItalic(true);
 
     $column = 'A';
 
     foreach ($headers as $header) {
-        $sheet->setCellValue($column . '3', $header);
+        $summarySheet->setCellValue($column . '3', $header);
         $column++;
     }
 
-    $headerStyle = $sheet->getStyle('A3:' . $lastColumn . '3');
+    $headerStyle = $summarySheet->getStyle('A3:' . $lastColumn . '3');
 
     $headerStyle->getFont()->setBold(true);
     $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -134,12 +152,17 @@ if ($role === 'Super-Admin') {
     $headerStyle->getBorders()->getAllBorders()
         ->setBorderStyle(Border::BORDER_THIN);
 
-    $timeCondition = "1=1";
-
     if ($type === 'monthly') {
+
         $timeCondition = "MONTH(p.tanggal) = '$month' AND YEAR(p.tanggal) = '$year'";
+
     } elseif ($type === 'period') {
+
         $timeCondition = "p.tanggal BETWEEN '$startDateEscaped' AND '$endDateEscaped'";
+
+    } else {
+
+        $timeCondition = "1=1";
     }
 
     $query = "
@@ -189,12 +212,12 @@ if ($role === 'Super-Admin') {
 
     while ($row = mysqli_fetch_assoc($result)) {
 
-        $sheet->setCellValue('A' . $rowNumber, $row['nama'] ?? '');
-        $sheet->setCellValue('B' . $rowNumber, $row['divisi'] ?? '');
-        $sheet->setCellValue('C' . $rowNumber, $row['nup'] ?? '');
-        $sheet->setCellValue('D' . $rowNumber, (int)($row['total_present'] ?? 0));
-        $sheet->setCellValue('E' . $rowNumber, (int)($row['total_sick'] ?? 0));
-        $sheet->setCellValue('F' . $rowNumber, (int)($row['total_permission_leave'] ?? 0));
+        $summarySheet->setCellValue('A' . $rowNumber, $row['nama'] ?? '');
+        $summarySheet->setCellValue('B' . $rowNumber, $row['divisi'] ?? '');
+        $summarySheet->setCellValue('C' . $rowNumber, $row['nup'] ?? '');
+        $summarySheet->setCellValue('D' . $rowNumber, (int)($row['total_present'] ?? 0));
+        $summarySheet->setCellValue('E' . $rowNumber, (int)($row['total_sick'] ?? 0));
+        $summarySheet->setCellValue('F' . $rowNumber, (int)($row['total_permission_leave'] ?? 0));
 
         $rowNumber++;
     }
@@ -203,7 +226,7 @@ if ($role === 'Super-Admin') {
 
     if ($lastRow >= 3) {
 
-        $dataStyle = $sheet->getStyle('A3:F' . $lastRow);
+        $dataStyle = $summarySheet->getStyle('A3:F' . $lastRow);
 
         $dataStyle->getBorders()->getAllBorders()
             ->setBorderStyle(Border::BORDER_THIN);
@@ -211,37 +234,28 @@ if ($role === 'Super-Admin') {
         $dataStyle->getAlignment()
             ->setVertical(Alignment::VERTICAL_TOP);
 
-        $sheet->getStyle('A4:C' . $lastRow)
+        $summarySheet->getStyle('A4:C' . $lastRow)
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        $sheet->getStyle('D4:F' . $lastRow)
+        $summarySheet->getStyle('D4:F' . $lastRow)
             ->getAlignment()
             ->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->setAutoFilter('A3:F' . $lastRow);
+        $summarySheet->setAutoFilter('A3:F' . $lastRow);
     }
 
-    $sheet->getColumnDimension('A')->setWidth(30);
-    $sheet->getColumnDimension('B')->setWidth(20);
-    $sheet->getColumnDimension('C')->setWidth(15);
-    $sheet->getColumnDimension('D')->setWidth(20);
-    $sheet->getColumnDimension('E')->setWidth(15);
-    $sheet->getColumnDimension('F')->setWidth(22);
+    $summarySheet->getColumnDimension('A')->setWidth(30);
+    $summarySheet->getColumnDimension('B')->setWidth(20);
+    $summarySheet->getColumnDimension('C')->setWidth(15);
+    $summarySheet->getColumnDimension('D')->setWidth(20);
+    $summarySheet->getColumnDimension('E')->setWidth(15);
+    $summarySheet->getColumnDimension('F')->setWidth(22);
 
-    $sheet->freezePane('A4');
-
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    header('Cache-Control: max-age=0');
-
-    $writer = new Xlsx($spreadsheet);
-    $writer->save('php://output');
-
-    exit;
+    $summarySheet->freezePane('A4');
 }
 
-// Users
+//Export Tabs
 $headers = [
     'No.',
     'Date',
@@ -511,6 +525,7 @@ $sheet->getColumnDimension('P')->setWidth(18);
 $sheet->getColumnDimension('Q')->setWidth(25);
 
 $sheet->freezePane('A4');
+$spreadsheet->setActiveSheetIndex(0);
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="' . $filename . '"');

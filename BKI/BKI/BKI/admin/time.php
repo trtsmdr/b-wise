@@ -240,6 +240,7 @@
                                     <div class="d-flex gap-2">
                                         <a href="export_time.php?type=monthly&month=<?php echo urlencode($selected_month); ?>&year=<?php echo urlencode($selected_year); ?>" class="btn btn-outline-secondary"><i data-feather="download"></i> Monthly Export</a>
                                         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#periodExportModal"><i data-feather="download"></i> Period Export</button>
+                                        <a href="export_time.php?type=all" class="btn btn-outline-secondary"><i data-feather="download"></i> Export All</a>
                                     </div>
                                 </div>
                             </div>

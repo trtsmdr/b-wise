@@ -32,7 +32,7 @@ $check_attendance_query = "
 
 $check_attendance_result = mysqli_query($koneksi, $check_attendance_query);
 
-if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0) {
+if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0 && !isset($_SESSION['attendance_alert'])) {
     header("Location: dashboard.php");
     exit;
 }
@@ -49,7 +49,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
     <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
-    <title>Select Attendance - BKI Activity</title>
+    <title>BKI - Select Attendance</title>
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
@@ -186,6 +186,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function setActiveCard(value) {
@@ -318,5 +319,27 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
             });
         }
     </script>
+
+    <?php if (isset($_SESSION['attendance_alert'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const attendanceAlert = <?php echo json_encode($_SESSION['attendance_alert'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
+
+            Swal.fire({
+                icon: attendanceAlert.icon || 'info',
+                title: attendanceAlert.title || '',
+                text: attendanceAlert.text || '',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(function(result) {
+                if (result.isConfirmed && attendanceAlert.redirect) {
+                    window.location.href = attendanceAlert.redirect;
+                }
+            });
+        });
+    </script>
+    <?php unset($_SESSION['attendance_alert']); ?>
+    <?php endif; ?>
 </body>
 </html>
