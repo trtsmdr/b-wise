@@ -1,12 +1,69 @@
 <?php
-    session_start();
-    if (isset($_SESSION['username'])) {
+session_start();
+include("koneksi.php");
+
+date_default_timezone_set('Asia/Jakarta');
+
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: 0");
+
+if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
+    $user_id = (int) $_SESSION['user_id'];
+    $tanggal = date('Y-m-d');
+
+    if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1 && empty($_SESSION['role'])) {
+        header("Location: pilih_role.php");
+        exit;
+    }
+
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
+        $check_time_off_query = "
+            SELECT id
+            FROM time_off
+            WHERE user_id = $user_id
+            AND '$tanggal' BETWEEN start_date AND end_date
+            LIMIT 1
+        ";
+        $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+        if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+            header("Location: dashboard.php");
+            exit;
+        }
+
+        $check_time_query = "
+            SELECT id
+            FROM time
+            WHERE user_id = $user_id
+            AND tanggal = '$tanggal'
+            LIMIT 1
+        ";
+        $check_time_result = mysqli_query($koneksi, $check_time_query);
+
+        if ($check_time_result && mysqli_num_rows($check_time_result) > 0) {
+            header("Location: dashboard.php");
+            exit;
+        }
+
+        header("Location: pilih_kehadiran.php");
+        exit;
+    }
+
+    if (isset($_SESSION['role']) && !empty($_SESSION['role'])) {
         header("Location: dashboard.php");
         exit;
     }
 
-    $error = isset($_GET['error']) ? $_GET['error'] : '';
-    $success = isset($_GET['success']) ? $_GET['success'] : '';
+    if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1) {
+        header("Location: pilih_role.php");
+        exit;
+    }
+}
+
+$error = isset($_GET['error']) ? $_GET['error'] : '';
+$success = isset($_GET['success']) ? $_GET['success'] : '';
 ?>
 
 <!DOCTYPE html>

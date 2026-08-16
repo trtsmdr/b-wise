@@ -4,7 +4,12 @@ include("koneksi.php");
 
 date_default_timezone_set('Asia/Jakarta');
 
-if (!isset($_SESSION['username']) || !isset($_SESSION['role'])) {
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: 0");
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['username']) || !isset($_SESSION['role'])) {
     header("Location: Halaman_login.php");
     exit;
 }
@@ -15,26 +20,19 @@ if ($_SESSION['role'] !== 'User') {
 }
 
 $user_id = (int) $_SESSION['user_id'];
-$tanggal = date('Y-m-d');
+$today = date('Y-m-d');
 
-$today_query = "SELECT id FROM time WHERE user_id = $user_id AND tanggal = '$tanggal' LIMIT 1";
-$today_result = mysqli_query($koneksi, $today_query);
-
-if ($today_result && mysqli_num_rows($today_result) > 0) {
-    header("Location: dashboard.php");
-    exit;
-}
-
-$time_off_query = "
+$check_attendance_query = "
     SELECT id
-    FROM time_off
+    FROM time
     WHERE user_id = $user_id
-    AND '$tanggal' BETWEEN start_date AND end_date
+    AND tanggal = '$today'
     LIMIT 1
 ";
-$time_off_result = mysqli_query($koneksi, $time_off_query);
 
-if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+$check_attendance_result = mysqli_query($koneksi, $check_attendance_query);
+
+if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0) {
     header("Location: dashboard.php");
     exit;
 }
@@ -120,7 +118,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
                     <?php elseif ($error === 'overlap'): ?>
                         <div class="alert alert-danger">The selected absence date range overlaps with an existing record.</div>
                     <?php elseif ($error === 'invalid_file'): ?>
-                        <div class="alert alert-danger">Evidence must be JPG, JPEG, or PNG.</div>
+                        <div class="alert alert-danger">Evidence must be JPG, JPEG, PNG, or PDF.</div>
                     <?php elseif ($error === 'file_too_large'): ?>
                         <div class="alert alert-danger">Evidence file is too large. Maximum allowed size is 3MB.</div>
                     <?php elseif ($error === 'upload_failed'): ?>
@@ -155,18 +153,18 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
                         <div id="timeOffFields" class="hidden-section">
                             <div class="row">
                                 <div class="col-md-6 mb-1">
-                                    <label for="start_date" class="form-label">Start Date</label>
+                                    <label for="start_date" class="form-label">Start Date<span class="text-danger">*</span></label>
                                     <input type="date" name="start_date" id="start_date" class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-1">
-                                    <label for="end_date" class="form-label">End Date</label>
+                                    <label for="end_date" class="form-label">End Date<span class="text-danger">*</span></label>
                                     <input type="date" name="end_date" id="end_date" class="form-control">
                                 </div>
                             </div>
 
                             <div class="mb-1">
-                                <label for="evidence" class="form-label">Evidence (JPG/JPEG/PNG)</label>
-                                <input type="file" name="evidence" id="evidence" class="form-control" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                                <label for="evidence" class="form-label">Evidence (JPG/JPEG/PNG/PDF)<span class="text-danger">*</span></label>
+                                <input type="file" name="evidence" id="evidence" class="form-control" accept=".jpg,.jpeg,.png,.pdf,application/pdf">
                                 <span class="note-danger">Maximum file size: 3MB.</span>
                             </div>
 
@@ -212,13 +210,26 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
 
         function toggleTimeOffFields(value) {
             const section = document.getElementById('timeOffFields');
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            const evidence = document.getElementById('evidence');
+            const description = document.getElementById('description');
             const isTimeOff = value === 'Sick' || value === 'Permission/Leave';
+
             section.style.display = isTimeOff ? 'block' : 'none';
 
-            document.getElementById('start_date').required = isTimeOff;
-            document.getElementById('end_date').required = isTimeOff;
-            document.getElementById('evidence').required = isTimeOff;
-            document.getElementById('description').required = false;
+            startDate.required = isTimeOff;
+            endDate.required = isTimeOff;
+            evidence.required = isTimeOff;
+            description.required = false;
+
+            if (!isTimeOff) {
+                startDate.value = '';
+                endDate.value = '';
+                evidence.value = '';
+                description.value = '';
+                endDate.min = today;
+            }
         }
 
         const startDate = document.getElementById('start_date');
@@ -244,36 +255,50 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
         });
 
         document.getElementById('attendanceForm').addEventListener('submit', function(e) {
-            const selected = document.querySelector('input[name="attendance_type"]:checked').value;
+            const selectedInput = document.querySelector('input[name="attendance_type"]:checked');
+            const selected = selectedInput ? selectedInput.value : 'masuk';
+
+            if (selected === 'masuk') {
+                return;
+            }
+
             if (selected === 'Sick' || selected === 'Permission/Leave') {
-                const startDate = new Date(document.getElementById('start_date').value);
-                const endDate = new Date(document.getElementById('end_date').value);
-                if (endDate < startDate) {
+                const startValue = document.getElementById('start_date').value;
+                const endValue = document.getElementById('end_date').value;
+                const fileInput = document.getElementById('evidence');
+
+                if (!startValue || !endValue || !fileInput.files.length) {
+                    return;
+                }
+
+                const startDateValue = new Date(startValue);
+                const endDateValue = new Date(endValue);
+
+                if (endDateValue < startDateValue) {
                     e.preventDefault();
                     alert('End Date must be the same as or after Start Date.');
                     return;
                 }
 
-                const fileInput = document.getElementById('evidence');
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    const maxSize = 3 * 1024 * 1024;
-                    const allowedMimeTypes = ['image/jpeg', 'image/png'];
+                const file = fileInput.files[0];
+                const maxSize = 3 * 1024 * 1024;
+                const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 
-                    if (file.size > maxSize) {
-                        e.preventDefault();
-                        alert('Evidence file is too large. Maximum allowed size is 3MB.');
-                        return;
-                    }
+                if (file.size > maxSize) {
+                    e.preventDefault();
+                    alert('Evidence file is too large. Maximum allowed size is 3MB.');
+                    return;
+                }
 
-                    if (!allowedMimeTypes.includes(file.type)) {
-                        e.preventDefault();
-                        alert('Evidence must be JPG, JPEG, or PNG.');
-                        return;
-                    }
+                if (!allowedMimeTypes.includes(file.type)) {
+                    e.preventDefault();
+                    alert('Evidence must be JPG, JPEG, PNG, or PDF.');
+                    return;
                 }
             }
         });
+
+        toggleTimeOffFields('masuk');
 
         $(document).ready(function() {
             $('#attendanceModal').modal('show');
@@ -283,6 +308,13 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
             navigator.geolocation.getCurrentPosition(function(position) {
                 document.getElementById('latitude').value = position.coords.latitude;
                 document.getElementById('longitude').value = position.coords.longitude;
+            });
+        }
+
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, '', window.location.href);
+            window.addEventListener('popstate', function() {
+                window.history.pushState(null, '', window.location.href);
             });
         }
     </script>

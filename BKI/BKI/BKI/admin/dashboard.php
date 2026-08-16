@@ -11,6 +11,29 @@
 
     include("koneksi.php");
 
+    date_default_timezone_set('Asia/Jakarta');
+
+    $is_time_off_today = false;
+
+    if ($_SESSION['role'] === 'User') {
+        $user_id = (int) $_SESSION['user_id'];
+        $today = date('Y-m-d');
+
+        $check_time_off_query = "
+            SELECT id
+            FROM time_off
+            WHERE user_id = $user_id
+            AND '$today' BETWEEN start_date AND end_date
+            LIMIT 1
+        ";
+
+        $check_time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+        if ($check_time_off_result && mysqli_num_rows($check_time_off_result) > 0) {
+            $is_time_off_today = true;
+        }
+    }
+
     function is_superadmin() {
         return $_SESSION['role'] === 'Super-Admin';
     }
@@ -956,6 +979,13 @@
 
         sortSelectOptions();
 
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, '', window.location.href);
+            window.addEventListener('popstate', function() {
+                window.history.pushState(null, '', window.location.href);
+            });
+        }
+
         $('#name').on('select2:select', function() {
             $('.select2-selection--single').addClass('item-selected');
         });
@@ -1187,46 +1217,6 @@
     </script>
     
     <script>
-        function sendGeotagging(type) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const data = {
-                        type: type,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-
-                    fetch('simpan_geotagging.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log(`Geotagging ${type} berhasil disimpan`);
-                            if (type === 'login') {
-                                getGeotaggingData();
-                            }
-                        } else {
-                            console.error(`Gagal menyimpan geotagging ${type}:`, data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }, function(error) {
-                    console.error('Error:', error);
-                }, { enableHighAccuracy: true });
-            } else {
-                console.error('Geolocation tidak didukung oleh browser ini.');
-            }
-        }
-        
-        sendGeotagging('login');
-
         function getGeolocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {

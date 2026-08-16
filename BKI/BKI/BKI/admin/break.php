@@ -5,20 +5,53 @@ include("koneksi.php");
 date_default_timezone_set('Asia/Jakarta');
 
 if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'User') {
-    $user_id    = $_SESSION['user_id'];
-    $tanggal    = date('Y-m-d');
+    $user_id = (int) $_SESSION['user_id'];
+    $tanggal = date('Y-m-d');
     $current_time = date('H:i:s');
-    $latitude   = isset($_GET['latitude']) ? $_GET['latitude'] : null;
-    $longitude  = isset($_GET['longitude']) ? $_GET['longitude'] : null;
+    $latitude = isset($_GET['latitude']) ? $_GET['latitude'] : null;
+    $longitude = isset($_GET['longitude']) ? $_GET['longitude'] : null;
     $geotagging = $latitude && $longitude ? $latitude . ',' . $longitude : '';
 
-    $check_query  = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal'";
+    $check_time_off_query = "
+        SELECT id, absence_type
+        FROM time_off
+        WHERE user_id = $user_id
+        AND '$tanggal' BETWEEN start_date AND end_date
+        LIMIT 1
+    ";
+    $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+    if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+        session_destroy();
+        header("Location: ../../../../index.php");
+        exit;
+    }
+
+    $check_query = "
+        SELECT *
+        FROM time
+        WHERE user_id = $user_id
+        AND tanggal = '$tanggal'
+        AND time_off_id IS NULL
+        LIMIT 1
+    ";
     $check_result = mysqli_query($koneksi, $check_query);
 
     if (mysqli_num_rows($check_result) > 0) {
         $row = mysqli_fetch_assoc($check_result);
+
         if ($row['is_break'] == false && empty($row['before_break'])) {
-            $update_query = "UPDATE time SET before_break = '$current_time', geotagging_before_break = '$geotagging', is_break = true WHERE user_id = $user_id AND tanggal = '$tanggal'";
+            $update_query = "
+                UPDATE time
+                SET
+                    before_break = '$current_time',
+                    geotagging_before_break = '$geotagging',
+                    is_break = true
+                WHERE user_id = $user_id
+                AND tanggal = '$tanggal'
+                AND time_off_id IS NULL
+            ";
+
             if (mysqli_query($koneksi, $update_query)) {
                 echo "<!DOCTYPE html>
                         <html lang='en'>
@@ -46,6 +79,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'User') {
                                 </script>
                             </body>
                         </html>";
+
                 session_destroy();
                 exit;
             }
@@ -76,10 +110,37 @@ if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'User') {
                         </script>
                     </body>
                     </html>";
+
             exit;
         }
     } else {
-        $insert_query = "INSERT INTO time (tanggal, user_id, time_login, before_break, after_break, time_logout, geotagging_before_break, geotagging, is_break) VALUES ('$tanggal', $user_id, '00:00:00', '$current_time', '00:00:00', '00:00:00', '$geotagging', '', true)";
+        $insert_query = "
+            INSERT INTO time (
+                tanggal,
+                user_id,
+                time_login,
+                before_break,
+                after_break,
+                time_logout,
+                geotagging_before_break,
+                geotagging,
+                is_break,
+                status
+            )
+            VALUES (
+                '$tanggal',
+                $user_id,
+                '00:00:00',
+                '$current_time',
+                '00:00:00',
+                '00:00:00',
+                '$geotagging',
+                '',
+                true,
+                'On-time'
+            )
+        ";
+
         if (!mysqli_query($koneksi, $insert_query)) {
             die("Error inserting record: " . mysqli_error($koneksi));
         }
@@ -87,7 +148,6 @@ if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'User') {
 }
 
 session_destroy();
-header("location:../../../../index.php");
-
+header("Location: ../../../../index.php");
 exit;
 ?>

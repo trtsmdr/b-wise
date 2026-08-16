@@ -18,6 +18,22 @@
                 && $latitude >= -90 && $latitude <= 90
                 && $longitude >= -180 && $longitude <= 180;
             $geotagging = $is_valid_geo ? ($latitude . ',' . $longitude) : '';
+
+            $check_time_off_query = "
+                SELECT id, absence_type
+                FROM time_off
+                WHERE user_id = $user_id
+                AND '$tanggal' BETWEEN start_date AND end_date
+                LIMIT 1
+            ";
+            $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+            if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+                $_SESSION['login_latitude'] = '';
+                $_SESSION['login_longitude'] = '';
+                header("Location: dashboard.php");
+                exit;
+            }
         
             $check_query  = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal' LIMIT 1";
             $check_result = mysqli_query($koneksi, $check_query);

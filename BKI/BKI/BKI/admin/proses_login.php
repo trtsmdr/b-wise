@@ -14,6 +14,54 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
+if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
+    $user_id = (int) $_SESSION['user_id'];
+    $tanggal = date('Y-m-d');
+
+    if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1 && empty($_SESSION['role'])) {
+        header("Location: pilih_role.php");
+        exit;
+    }
+
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
+        $check_time_off_query = "
+            SELECT id
+            FROM time_off
+            WHERE user_id = $user_id
+            AND '$tanggal' BETWEEN start_date AND end_date
+            LIMIT 1
+        ";
+        $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+        if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+            header("Location: dashboard.php");
+            exit;
+        }
+
+        $check_time_query = "
+            SELECT id
+            FROM time
+            WHERE user_id = $user_id
+            AND tanggal = '$tanggal'
+            LIMIT 1
+        ";
+        $check_time_result = mysqli_query($koneksi, $check_time_query);
+
+        if ($check_time_result && mysqli_num_rows($check_time_result) > 0) {
+            header("Location: dashboard.php");
+            exit;
+        }
+
+        header("Location: pilih_kehadiran.php");
+        exit;
+    }
+
+    if (isset($_SESSION['role']) && !empty($_SESSION['role'])) {
+        header("Location: dashboard.php");
+        exit;
+    }
+}
+
 $username  = isset($_POST['username']) ? trim($_POST['username']) : '';
 $password  = isset($_POST['password']) ? $_POST['password'] : '';
 $latitude  = isset($_POST['latitude']) ? $_POST['latitude'] : null;
@@ -49,17 +97,44 @@ if (mysqli_num_rows($result) > 0) {
                 && $longitude >= -180 && $longitude <= 180;
             $geotagging = $is_valid_geo ? ($latitude . ',' . $longitude) : '';
 
-            $check_query  = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal' LIMIT 1";
+            $check_time_off_query = "
+                SELECT id, absence_type
+                FROM time_off
+                WHERE user_id = $user_id
+                AND '$tanggal' BETWEEN start_date AND end_date
+                LIMIT 1
+            ";
+            $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+
+            if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+                $_SESSION['login_latitude'] = '';
+                $_SESSION['login_longitude'] = '';
+                header("location: dashboard.php");
+                exit;
+            }
+
+            $check_query = "SELECT * FROM time WHERE user_id = $user_id AND tanggal = '$tanggal' LIMIT 1";
             $check_result = mysqli_query($koneksi, $check_query);
-        
+
             if (mysqli_num_rows($check_result) > 0) {
                 $row = mysqli_fetch_assoc($check_result);
+
                 if ((int) $row['is_break'] === 1 && empty($row['after_break'])) {
-                    $update_query = "UPDATE time SET after_break = '$time_login', geotagging_after_break = '$geotagging', is_break = false WHERE user_id = $user_id AND tanggal = '$tanggal'";
+                    $update_query = "
+                        UPDATE time
+                        SET
+                            after_break = '$time_login',
+                            geotagging_after_break = '$geotagging',
+                            is_break = 0
+                        WHERE user_id = $user_id
+                        AND tanggal = '$tanggal'
+                        AND time_off_id IS NULL
+                    ";
+
                     if (!mysqli_query($koneksi, $update_query)) {
                         die("Error updating record: " . mysqli_error($koneksi));
                     }
-                
+
                     echo "<!DOCTYPE html>
                             <html lang='en'>
                                 <head>
@@ -86,23 +161,9 @@ if (mysqli_num_rows($result) > 0) {
                                     </script>
                                 </body>
                             </html>";
-                        exit;
+                    exit;
                 }
 
-                header("location: dashboard.php");
-                exit;
-            }
-
-            $check_time_off_query = "
-                SELECT id
-                FROM time_off
-                WHERE user_id = $user_id
-                AND '$tanggal' BETWEEN start_date AND end_date
-                LIMIT 1
-            ";
-            $time_off_result = mysqli_query($koneksi, $check_time_off_query);
-
-            if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
                 header("location: dashboard.php");
                 exit;
             }

@@ -1,8 +1,34 @@
 <?php
 session_start();
+include("koneksi.php");
 
-if (!isset($_SESSION['roles']) || count($_SESSION['roles']) <= 1) {
-    header("Location: dashboard.php");
+date_default_timezone_set('Asia/Jakarta');
+
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: 0");
+
+if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
+    header("Location: Halaman_login.php");
+    exit;
+}
+
+if (!isset($_SESSION['roles']) || !is_array($_SESSION['roles']) || count($_SESSION['roles']) <= 1) {
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
+        header("Location: pilih_kehadiran.php");
+    } else {
+        header("Location: dashboard.php");
+    }
+    exit;
+}
+
+if (isset($_SESSION['role']) && $_SESSION['role'] !== '') {
+    if ($_SESSION['role'] === 'User') {
+        header("Location: pilih_kehadiran.php");
+    } else {
+        header("Location: dashboard.php");
+    }
     exit;
 }
 
@@ -77,9 +103,6 @@ $roles = $_SESSION['roles'];
                             </select>
                         </div>
                         
-                        <input type="hidden" name="latitude" id="latitude">
-                        <input type="hidden" name="longitude" id="longitude">
-                        
                         <div class="d-flex justify-content-end mt-2">
                             <button type="submit" class="btn btn-primary">Continue</button>
                         </div>
@@ -114,10 +137,10 @@ $roles = $_SESSION['roles'];
     </script>
 
     <script>
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('latitude').value = position.coords.latitude;
-                document.getElementById('longitude').value = position.coords.longitude;
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, '', window.location.href);
+            window.addEventListener('popstate', function() {
+                window.history.pushState(null, '', window.location.href);
             });
         }
     </script>

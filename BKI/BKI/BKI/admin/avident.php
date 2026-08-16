@@ -541,138 +541,98 @@
     </script>
 
     <script>
-        function sendGeotagging(type) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const data = {
-                        type: type,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-
-                    fetch('simpan_geotagging.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log(`Geotagging ${type} berhasil disimpan`);
-                            if (type === 'login') {
-                                getGeotaggingData();
-                            }
-                        } else {
-                            console.error(`Gagal menyimpan geotagging ${type}:`, data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }, function(error) {
-                    console.error('Error:', error);
-                }, { enableHighAccuracy: true });
-            } else {
-                console.error('Geolocation tidak didukung oleh browser ini.');
-            }
-        }
-        
-        sendGeotagging('login');
-
-        function getGeolocation(callback) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    callback(position.coords.latitude, position.coords.longitude);
-                }, function(error) {
-                    console.error("Error getting geolocation: ", error);
-                    callback(null, null);
-                });
-            } else {
-                console.error("Geolocation is not supported by this browser.");
+    function getGeolocation(callback) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                callback(position.coords.latitude, position.coords.longitude);
+            }, function(error) {
+                console.error("Error getting geolocation: ", error);
                 callback(null, null);
-            }
-        }
-
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will be logged out!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Final Check',
-                        text: "Have you finished all your work for today?",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, I am done!',
-                        cancelButtonText: 'No, let me finish'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            getGeolocation(function(latitude, longitude) {
-                                if (latitude && longitude) {
-                                    window.location.href = 'logout.php?latitude=' + latitude + '&longitude=' + longitude;
-                                } else {
-                                    window.location.href = 'logout.php';
-                                }
-                            });
-                        }
-                    });
-                }
             });
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+            callback(null, null);
         }
+    }
 
-        function confirmBreak() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will take a break!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, break!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    getGeolocation(function(latitude, longitude) {
-                        if (latitude && longitude) {
-                            window.location.href = 'break.php?latitude=' + latitude + '&longitude=' + longitude;
-                        } else {
-                            window.location.href = 'break.php';
-                        }
-                    });
-                }
-            });
-        }
-
-        function checkTime() {
-            var now = new Date();
-            var hours = now.getHours();
-            var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
-
-            if (hours === 23 && minutes === 59 && seconds === 59) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "logout.php", true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        window.location.href = "Halaman_login.php?error=session_expired";
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Final Check',
+                    text: "Have you finished all your work for today?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, I am done!',
+                    cancelButtonText: 'No, let me finish'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        getGeolocation(function(latitude, longitude) {
+                            if (latitude && longitude) {
+                                window.location.href = 'logout.php?latitude=' + latitude + '&longitude=' + longitude;
+                            } else {
+                                window.location.href = 'logout.php';
+                            }
+                        });
                     }
-                };
-                xhr.send();
+                });
             }
-        }
+        });
+    }
 
-        setInterval(checkTime, 1000);
+    function confirmBreak() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will take a break!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, break!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                getGeolocation(function(latitude, longitude) {
+                    if (latitude && longitude) {
+                        window.location.href = 'break.php?latitude=' + latitude + '&longitude=' + longitude;
+                    } else {
+                        window.location.href = 'break.php';
+                    }
+                });
+            }
+        });
+    }
+
+    function checkTime() {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        if (hours === 23 && minutes === 59 && seconds === 59) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "logout.php", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    window.location.href = "Halaman_login.php?error=session_expired";
+                }
+            };
+            xhr.send();
+        }
+    }
+
+    setInterval(checkTime, 1000);
     </script>
 
 </body>

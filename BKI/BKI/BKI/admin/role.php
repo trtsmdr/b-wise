@@ -508,46 +508,6 @@
     </script>
 
     <script>
-        function sendGeotagging(type) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const data = {
-                        type: type,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-
-                    fetch('simpan_geotagging.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log(`Geotagging ${type} berhasil disimpan`);
-                            if (type === 'login') {
-                                getGeotaggingData();
-                            }
-                        } else {
-                            console.error(`Gagal menyimpan geotagging ${type}:`, data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }, function(error) {
-                    console.error('Error:', error);
-                }, { enableHighAccuracy: true });
-            } else {
-                console.error('Geolocation tidak didukung oleh browser ini.');
-            }
-        }
-        
-        sendGeotagging('login');
-
         function getGeolocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
