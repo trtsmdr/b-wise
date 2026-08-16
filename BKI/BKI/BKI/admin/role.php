@@ -113,7 +113,7 @@
     <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
-    <title>BKI - Role</title>
+    <title>B - WISE - Role</title>
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
     
@@ -195,7 +195,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="#">
-                        <h2 class="brand-text" style="font-size: 20px;">BKI</h2>
+                        <h2 class="brand-text" style="font-size: 20px;">B - WISE </h2>
                         <hr>
                     </a>
                 </li>
@@ -223,7 +223,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    
     <!-- END: Main Menu-->
 
     <!-- BEGIN: Content-->
@@ -348,7 +348,7 @@
 
     <!-- BEGIN: Footer-->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2024</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
     <!-- END: Footer-->
@@ -508,6 +508,46 @@
     </script>
 
     <script>
+        function sendGeotagging(type) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const data = {
+                        type: type,
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    };
+
+                    fetch('simpan_geotagging.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log(`Geotagging ${type} berhasil disimpan`);
+                            if (type === 'login') {
+                                getGeotaggingData();
+                            }
+                        } else {
+                            console.error(`Gagal menyimpan geotagging ${type}:`, data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }, function(error) {
+                    console.error('Error:', error);
+                }, { enableHighAccuracy: true });
+            } else {
+                console.error('Geolocation tidak didukung oleh browser ini.');
+            }
+        }
+        
+        sendGeotagging('login');
+
         function getGeolocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
