@@ -1,45 +1,44 @@
 <?php
-session_start();
-include("koneksi.php");
+    session_start();
+    include("koneksi.php");
 
-date_default_timezone_set('Asia/Jakarta');
+    date_default_timezone_set('Asia/Jakarta');
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-header("Expires: 0");
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+    header("Expires: 0");
 
-if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
-    header("Location: Halaman_login.php");
-    exit;
-}
-
-if (!isset($_SESSION['roles']) || !is_array($_SESSION['roles']) || count($_SESSION['roles']) <= 1) {
-    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
-        header("Location: pilih_kehadiran.php");
-    } else {
-        header("Location: dashboard.php");
+    if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
+        header("Location: Halaman_login.php");
+        exit;
     }
-    exit;
-}
 
-if (isset($_SESSION['role']) && $_SESSION['role'] !== '') {
-    if ($_SESSION['role'] === 'User') {
-        header("Location: pilih_kehadiran.php");
-    } else {
-        header("Location: dashboard.php");
+    if (!isset($_SESSION['roles']) || !is_array($_SESSION['roles']) || count($_SESSION['roles']) <= 1) {
+        if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
+            header("Location: pilih_kehadiran.php");
+        } else {
+            header("Location: dashboard.php");
+        }
+        exit;
     }
-    exit;
-}
 
-$roles = $_SESSION['roles'];
+    if (isset($_SESSION['role']) && $_SESSION['role'] !== '') {
+        if ($_SESSION['role'] === 'User') {
+            header("Location: pilih_kehadiran.php");
+        } else {
+            header("Location: dashboard.php");
+        }
+        exit;
+    }
+
+    $roles = $_SESSION['roles'];
 ?>
 
 <!DOCTYPE html>
 
 <html class="loading semi-dark-layout" lang="en" data-layout="semi-dark-layout" data-textdirection="ltr">
 
-<!-- BEGIN: Head-->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
@@ -50,27 +49,27 @@ $roles = $_SESSION['roles'];
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+    <!-- BEGIN: Vendor CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
+    <!-- END: Vendor CSS -->
 
-    <!-- BEGIN: Theme CSS-->
+    <!-- BEGIN: Theme CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/themes/semi-dark-layout.css">
-    <!-- END: Theme CSS-->
+    <!-- END: Theme CSS -->
 
-    <!-- BEGIN: Page CSS-->
+    <!-- BEGIN: Page CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/core/menu/menu-types/vertical-menu.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/plugins/forms/form-validation.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/pages/page-auth.css">
-    <!-- END: Page CSS-->
+    <!-- END: Page CSS -->
 
-    <!-- BEGIN: Custom CSS-->
+    <!-- BEGIN: Custom CSS -->
     <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css">
-    <!-- END: Custom CSS-->
+    <!-- END: Custom CSS -->
 
     <style>
         .btn-primary {
@@ -85,7 +84,7 @@ $roles = $_SESSION['roles'];
 
 <body>
 
-    <!-- BEGIN: Header-->
+    <!-- BEGIN: Content -->
     <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -111,24 +110,24 @@ $roles = $_SESSION['roles'];
             </div>
         </div>
     </div>
-    <!-- END: Content-->
+    <!-- END: Content -->
 
-    <!-- BEGIN: Vendor JS-->
+    <!-- BEGIN: Vendor JS -->
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    <!-- BEGIN Vendor JS-->
+    <!-- END: Vendor JS -->
 
-    <!-- BEGIN: Page Vendor JS-->
+    <!-- BEGIN: Page Vendor JS -->
     <script src="../../../app-assets/vendors/js/forms/validation/jquery.validate.min.js"></script>
-    <!-- END: Page Vendor JS-->
+    <!-- END: Page Vendor JS -->
 
-    <!-- BEGIN: Theme JS-->
+    <!-- BEGIN: Theme JS -->
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    <!-- END: Theme JS-->
+    <!-- END: Theme JS -->
 
-    <!-- BEGIN: Page JS-->
+    <!-- BEGIN: Page JS -->
     <script src="../../../app-assets/js/scripts/pages/page-auth-login.js"></script>
-    <!-- END: Page JS-->
+    <!-- END: Page JS -->
 
     <script>
         $(document).ready(function() {

@@ -108,7 +108,6 @@
 
 <html class="loading semi-dark-layout" lang="en" data-layout="semi-dark-layout" data-textdirection="ltr">
 
-<!-- BEGIN: Head-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -120,21 +119,21 @@
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+    <!-- BEGIN: Vendor CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
+    <!-- END: Vendor CSS -->
 
-    <!-- BEGIN: Theme CSS-->
+    <!-- BEGIN: Theme CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/themes/semi-dark-layout.css">
-    <!-- END: Theme CSS-->
+    <!-- END: Theme CSS -->
 
-    <!-- BEGIN: Page CSS-->
+    <!-- BEGIN: Page CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/core/menu/menu-types/vertical-menu.css">
-    <!-- END: Page CSS-->
+    <!-- END: Page CSS -->
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
@@ -168,7 +167,7 @@
 
 <body class="vertical-layout vertical-menu-modern  navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="">
 
-    <!-- BEGIN: Header-->
+    <!-- BEGIN: Header -->
     <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow container-xxl">
         <div class="navbar-container d-flex content">
             <div class="d-flex align-items-center">
@@ -190,9 +189,9 @@
             </ul>
         </div>
     </nav>
-    <!-- END: Header-->
+    <!-- END: Header -->
 
-    <!-- BEGIN: Main Menu-->
+    <!-- BEGIN: Main Menu -->
     <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
@@ -215,7 +214,7 @@
                             </li>
                             <li class="active"><a class="d-flex align-items-center" href="planning.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Planning">Planning</span></a>
                             </li>
-                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Avident">Evidence</span></a>
+                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Evidence">Evidence</span></a>
                             </li>
                         </ul>
                     </li><br>
@@ -229,9 +228,9 @@
             </div>
         </div>
     </div>
-    <!-- END: Main Menu-->
+    <!-- END: Main Menu -->
 
-    <!-- BEGIN: Content-->
+    <!-- BEGIN: Content -->
     <div class="app-content content ">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
@@ -387,26 +386,26 @@
             </div>
         </div>
     </div>
-    <!-- END: Content-->
+    <!-- END: Content -->
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-    <!-- BEGIN: Footer-->
+    <!-- BEGIN: Footer -->
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Cabang Utama Komersial Jakarta <span class="d-none d-sm-inline-block">2026</span></span></p>
+        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
-    <!-- END: Footer-->
+    <!-- END: Footer -->
 
-    <!-- BEGIN: Vendor JS-->
+    <!-- BEGIN: Vendor JS -->
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    <!-- END: Vendor JS-->
+    <!-- END: Vendor JS -->
 
-    <!-- BEGIN: Theme JS-->
+    <!-- BEGIN: Theme JS -->
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    <!-- END: Theme JS-->
+    <!-- END: Theme JS -->
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>

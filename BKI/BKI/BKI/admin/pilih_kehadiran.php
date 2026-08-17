@@ -1,43 +1,43 @@
 <?php
-session_start();
-include("koneksi.php");
+    session_start();
+    include("koneksi.php");
 
-date_default_timezone_set('Asia/Jakarta');
+    date_default_timezone_set('Asia/Jakarta');
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-header("Expires: 0");
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+    header("Expires: 0");
 
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['username']) || !isset($_SESSION['role'])) {
-    header("Location: Halaman_login.php");
-    exit;
-}
+    if (!isset($_SESSION['user_id']) || !isset($_SESSION['username']) || !isset($_SESSION['role'])) {
+        header("Location: Halaman_login.php");
+        exit;
+    }
 
-if ($_SESSION['role'] !== 'User') {
-    header("Location: dashboard.php");
-    exit;
-}
+    if ($_SESSION['role'] !== 'User') {
+        header("Location: dashboard.php");
+        exit;
+    }
 
-$user_id = (int) $_SESSION['user_id'];
-$today = date('Y-m-d');
+    $user_id = (int) $_SESSION['user_id'];
+    $today = date('Y-m-d');
 
-$check_attendance_query = "
-    SELECT id
-    FROM time
-    WHERE user_id = $user_id
-    AND tanggal = '$today'
-    LIMIT 1
-";
+    $check_attendance_query = "
+        SELECT id
+        FROM time
+        WHERE user_id = $user_id
+        AND tanggal = '$today'
+        LIMIT 1
+    ";
 
-$check_attendance_result = mysqli_query($koneksi, $check_attendance_query);
+    $check_attendance_result = mysqli_query($koneksi, $check_attendance_query);
 
-if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0 && !isset($_SESSION['attendance_alert'])) {
-    header("Location: dashboard.php");
-    exit;
-}
+    if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0 && !isset($_SESSION['attendance_alert'])) {
+        header("Location: dashboard.php");
+        exit;
+    }
 
-$error = isset($_GET['error']) ? $_GET['error'] : '';
+    $error = isset($_GET['error']) ? $_GET['error'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -184,8 +184,10 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
     </div>
 
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
+    
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -341,5 +343,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
     </script>
     <?php unset($_SESSION['attendance_alert']); ?>
     <?php endif; ?>
+    
 </body>
 </html>
