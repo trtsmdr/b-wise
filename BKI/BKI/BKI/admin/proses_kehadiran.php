@@ -1,6 +1,25 @@
 <?php
 session_start();
+
 include("koneksi.php");
+
+date_default_timezone_set('Asia/Jakarta');
+
+$document_root = realpath($_SERVER['DOCUMENT_ROOT']);
+$project_root = realpath(__DIR__ . '/../../../..');
+$relative_path = str_replace('\\', '/', str_replace($document_root, '', $project_root));
+
+$base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+
+$index_url = $base_url . rtrim($relative_path, '/') . '/index.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout_after_attendance'])) {
+    session_unset();
+    session_destroy();
+
+    header("Location: " . $index_url);
+    exit;
+}
 
 date_default_timezone_set('Asia/Jakarta');
 
@@ -269,19 +288,14 @@ if (!mysqli_query($koneksi, $insert_time_off_query)) {
 
     unset($_SESSION['login_latitude'], $_SESSION['login_longitude']);
 
-    $document_root = realpath($_SERVER['DOCUMENT_ROOT']);
-    $project_root = realpath(__DIR__ . '/../../../..');
-    $relative_path = str_replace('\\', '/', str_replace($document_root, '', $project_root));
-
-    $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-
     $_SESSION['attendance_alert'] = [
         'icon' => 'success',
         'title' => $absence_type === 'Sick'
             ? 'Sick submission successful!'
             : 'Permission/Leave submission successful!',
         'text' => 'Your submission has been recorded successfully.',
-        'redirect' => $base_url . rtrim($relative_path, '/') . '/index.php'
+        'redirect' => $index_url,
+        'logout_after_alert' => true
     ];
 
     header("Location: pilih_kehadiran.php");

@@ -292,14 +292,20 @@
 
                                         while ($row = mysqli_fetch_assoc($result)) {
                                             $gambar_arr = explode(',', $row['gambar']);
-                                            $upload_time = new DateTime($row['time_upload_activity_planning']);
-                                            $time_upload_avident = $row['time_upload_avident'] !== '00:00:00' ? new DateTime($row['time_upload_avident']) : null;
 
-                                            $planning_date = new DateTime($row['tanggal']);
-                                            
-                                            $is_today = $planning_date->format('Y-m-d') === $current_date->format('Y-m-d');
-                                            $is_done = !$is_today && $time_upload_avident !== null && $time_upload_avident->format('H:i:s') !== '00:00:00';
-                                            $is_warning = !$is_today && ($time_upload_avident === null || $time_upload_avident->format('H:i:s') === '00:00:00');
+                                            $upload_time = !empty($row['time_upload_activity_planning']) && $row['time_upload_activity_planning'] !== '00:00:00'
+                                                ? new DateTime($row['time_upload_activity_planning'])
+                                                : null;
+
+                                            $time_upload_avident = !empty($row['time_upload_avident']) && $row['time_upload_avident'] !== '00:00:00'
+                                                ? new DateTime($row['time_upload_avident'])
+                                                : null;
+
+                                            $planning_date = !empty($row['tanggal']) ? new DateTime($row['tanggal']) : null;
+
+                                            $is_today = $planning_date !== null && $planning_date->format('Y-m-d') === $current_date->format('Y-m-d');
+                                            $is_done = !$is_today && $time_upload_avident !== null;
+                                            $is_warning = !$is_today && $time_upload_avident === null;
                                             $is_upload = $is_today;
                                         ?>
                                         <tr>

@@ -30,11 +30,15 @@
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-        $tanggal = date('Y-m-d');
+    $tanggal = date('Y-m-d');
 
-        $user_id = $_SESSION['user_id'];
+    if (is_user()) {
+        $user_id = (int) $_SESSION['user_id'];
+    } else {
+        $user_id = isset($_POST['user_id']) ? (int) $_POST['user_id'] : 0;
+    }
 
-        $deskripsi = htmlspecialchars($_POST['deskripsi']);
+    $deskripsi = htmlspecialchars($_POST['deskripsi']);
 
         $time_upload_activity_planning = date('Y-m-d H:i:s');
 

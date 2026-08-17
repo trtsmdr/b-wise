@@ -28,8 +28,17 @@
         return $_SESSION['role'] === 'User';
     }
 
-    $selected_month = date('m'); 
-    $selected_year  = date('Y');
+    $selected_month = date('m');
+    $selected_year = date('Y');
+
+    $update_incomplete_query = "
+        UPDATE planning
+        SET status = 'Incomplete'
+        WHERE tanggal < CURDATE()
+        AND status = 'On-progress'
+        AND (gambar IS NULL OR gambar = '')
+    ";
+    mysqli_query($koneksi, $update_incomplete_query);
 
     if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['search'])) {
         $selected_month = htmlspecialchars($_GET['month']);
@@ -346,18 +355,16 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php 
-                                                    $statusClass = '';
-                                                    $statusText = '';
-                                                    if (!empty($row['gambar'])) {
+                                                <?php
+                                                    if ($row['status'] === 'Completed') {
                                                         $statusClass = 'badge bg-success';
-                                                        $statusText = 'Completed';
+                                                    } elseif ($row['status'] === 'Incomplete') {
+                                                        $statusClass = 'badge bg-danger';
                                                     } else {
                                                         $statusClass = 'badge bg-warning';
-                                                        $statusText = 'On-progress';
                                                     }
                                                 ?>
-                                                <span class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                                <span class="<?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
                                             </td>
                                             <td><?php echo $row['history_update']; ?></td>
                                             <?php if (is_superadmin() || is_user()): ?>
@@ -532,9 +539,7 @@
                 }
             });
         }
-    </script>
-
-    <script>
+        
         function getGeolocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {

@@ -333,6 +333,22 @@ $error = isset($_GET['error']) ? $_GET['error'] : '';
                 allowOutsideClick: false,
                 allowEscapeKey: false
             }).then(function(result) {
+                if (result.isConfirmed && attendanceAlert.logout_after_alert) {
+                    const logoutForm = document.createElement('form');
+                    logoutForm.method = 'POST';
+                    logoutForm.action = 'proses_kehadiran.php';
+
+                    const logoutInput = document.createElement('input');
+                    logoutInput.type = 'hidden';
+                    logoutInput.name = 'logout_after_attendance';
+                    logoutInput.value = '1';
+
+                    logoutForm.appendChild(logoutInput);
+                    document.body.appendChild(logoutForm);
+                    logoutForm.submit();
+                    return;
+                }
+
                 if (result.isConfirmed && attendanceAlert.redirect) {
                     window.location.href = attendanceAlert.redirect;
                 }
