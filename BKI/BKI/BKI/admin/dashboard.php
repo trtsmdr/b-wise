@@ -42,7 +42,6 @@
         return $_SESSION['role'] === 'Admin';
     }
 
-
     function is_user() {
         return $_SESSION['role'] === 'User';
     }
@@ -363,6 +362,24 @@
 
     date_default_timezone_set('Asia/Jakarta');
     $current_time = date('H:i:s');
+
+    $imageName = trim($image);
+    $imagePath = '';
+
+    $extensions = ['jpg', 'jpeg', 'png', 'webp', 'heic'];
+
+    foreach ($extensions as $ext) {
+        $filePath = __DIR__ . '/img/' . $imageName . '.' . $ext;
+
+        if (file_exists($filePath)) {
+            $imagePath = 'img/' . $imageName . '.' . $ext;
+            break;
+        }
+    }
+
+    if ($imagePath === '') {
+        $imagePath = 'img/default.png';
+    }
 ?>
 
 <!DOCTYPE html>
@@ -447,6 +464,13 @@
             font-size: 14px;
             width: 405px;
         }
+        .profile-navbar-img {
+            width: 40px !important;
+            height: 40px !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            border-radius: 50% !important;
+        }
     </style>
 </head>
 
@@ -462,7 +486,7 @@
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
                 <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round" src="img/<?php echo $image; ?>" alt="" height="40" width="40"><span class="avatar-status-online"></span></span>
+                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round profile-navbar-img" src="<?php echo htmlspecialchars($imagePath); ?>" alt="Profile"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user"><a class="dropdown-item" href="profile.php"><i class="me-50" data-feather="user"></i> Profile</a>
                         <?php if (is_user()): ?>
