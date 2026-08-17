@@ -177,7 +177,7 @@
                     <i class="fa-solid fa-4"></i>
                 </div>
                     <h3>Logout to Record Home Time</h3>
-                    <p>Once you are done working, click the "Logout" button available on the profile icon. Your logout time will be automatically recorded by the system</p>
+                    <p>Once you are done working, click the "Logout" button available on the profile icon. Your logout time will be automatically recorded by the system.</p>
                 </div>
             </div>
             </div><!-- End Guide Item -->
