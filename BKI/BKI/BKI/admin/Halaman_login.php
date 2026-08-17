@@ -1,76 +1,75 @@
 <?php
-session_start();
-include("koneksi.php");
+    session_start();
+    include("koneksi.php");
 
-date_default_timezone_set('Asia/Jakarta');
+    date_default_timezone_set('Asia/Jakarta');
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-header("Expires: 0");
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+    header("Expires: 0");
 
-if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
-    $user_id = (int) $_SESSION['user_id'];
-    $tanggal = date('Y-m-d');
+    if (isset($_SESSION['user_id']) && isset($_SESSION['username'])) {
+        $user_id = (int) $_SESSION['user_id'];
+        $tanggal = date('Y-m-d');
 
-    if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1 && empty($_SESSION['role'])) {
-        header("Location: pilih_role.php");
-        exit;
-    }
+        if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1 && empty($_SESSION['role'])) {
+            header("Location: pilih_role.php");
+            exit;
+        }
 
-    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
-        $check_time_off_query = "
-            SELECT id
-            FROM time_off
-            WHERE user_id = $user_id
-            AND '$tanggal' BETWEEN start_date AND end_date
-            LIMIT 1
-        ";
-        $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+        if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
+            $check_time_off_query = "
+                SELECT id
+                FROM time_off
+                WHERE user_id = $user_id
+                AND '$tanggal' BETWEEN start_date AND end_date
+                LIMIT 1
+            ";
+            $time_off_result = mysqli_query($koneksi, $check_time_off_query);
 
-        if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+            if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+                header("Location: dashboard.php");
+                exit;
+            }
+
+            $check_time_query = "
+                SELECT id
+                FROM time
+                WHERE user_id = $user_id
+                AND tanggal = '$tanggal'
+                LIMIT 1
+            ";
+            $check_time_result = mysqli_query($koneksi, $check_time_query);
+
+            if ($check_time_result && mysqli_num_rows($check_time_result) > 0) {
+                header("Location: dashboard.php");
+                exit;
+            }
+
+            header("Location: pilih_kehadiran.php");
+            exit;
+        }
+
+        if (isset($_SESSION['role']) && !empty($_SESSION['role'])) {
             header("Location: dashboard.php");
             exit;
         }
 
-        $check_time_query = "
-            SELECT id
-            FROM time
-            WHERE user_id = $user_id
-            AND tanggal = '$tanggal'
-            LIMIT 1
-        ";
-        $check_time_result = mysqli_query($koneksi, $check_time_query);
-
-        if ($check_time_result && mysqli_num_rows($check_time_result) > 0) {
-            header("Location: dashboard.php");
+        if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1) {
+            header("Location: pilih_role.php");
             exit;
         }
-
-        header("Location: pilih_kehadiran.php");
-        exit;
     }
 
-    if (isset($_SESSION['role']) && !empty($_SESSION['role'])) {
-        header("Location: dashboard.php");
-        exit;
-    }
-
-    if (isset($_SESSION['roles']) && count($_SESSION['roles']) > 1) {
-        header("Location: pilih_role.php");
-        exit;
-    }
-}
-
-$error = isset($_GET['error']) ? $_GET['error'] : '';
-$success = isset($_GET['success']) ? $_GET['success'] : '';
+    $error = isset($_GET['error']) ? $_GET['error'] : '';
+    $success = isset($_GET['success']) ? $_GET['success'] : '';
 ?>
 
 <!DOCTYPE html>
 
 <html class="loading semi-dark-layout" lang="en" data-layout="semi-dark-layout" data-textdirection="ltr">
 
-<!-- BEGIN: Head-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -82,27 +81,27 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+    <!-- BEGIN: Vendor CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
+    <!-- END: Vendor CSS -->
 
-    <!-- BEGIN: Theme CSS-->
+    <!-- BEGIN: Theme CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/themes/semi-dark-layout.css">
-    <!-- END: Theme CSS-->
+    <!-- END: Theme CSS -->
 
-    <!-- BEGIN: Page CSS-->
+    <!-- BEGIN: Page CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/core/menu/menu-types/vertical-menu.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/plugins/forms/form-validation.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/pages/page-auth.css">
-    <!-- END: Page CSS-->
+    <!-- END: Page CSS -->
 
-    <!-- BEGIN: Custom CSS-->
+    <!-- BEGIN: Custom CSS -->
     <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css">
-    <!-- END: Custom CSS-->
+    <!-- END: Custom CSS -->
 
     <style>
         .btn-primary {
@@ -116,7 +115,8 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
 </head>
 
 <body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
-    <!-- BEGIN: Content-->
+    
+    <!-- BEGIN: Content -->
     <div class="app-content content ">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
@@ -183,24 +183,25 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
             </div>
         </div>
     </div>
+    <!-- END: Content -->
 
-    <!-- BEGIN: Vendor JS-->
+    <!-- BEGIN: Vendor JS -->
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    <!-- BEGIN Vendor JS-->
+    <!-- END: Vendor JS -->
 
-    <!-- BEGIN: Page Vendor JS-->
+    <!-- BEGIN: Page Vendor JS -->
     <script src="../../../app-assets/vendors/js/forms/validation/jquery.validate.min.js"></script>
-    <!-- END: Page Vendor JS-->
+    <!-- END: Page Vendor JS -->
 
-    <!-- BEGIN: Theme JS-->
+    <!-- BEGIN: Theme JS -->
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    <!-- END: Theme JS-->
+    <!-- END: Theme JS -->
 
-    <!-- BEGIN: Page JS-->
+    <!-- BEGIN: Page JS -->
     <script src="../../../app-assets/js/scripts/pages/page-auth-login.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- END: Page JS-->
+    <!-- END: Page JS -->
 
     <script>
         $(window).on('load', function() {

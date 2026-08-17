@@ -1,571 +1,53 @@
 <?php
+    session_start();
 
-session_start();
+    if (!isset($_SESSION['username'])) {
+        header("Location: Halaman_login.php");
+        exit;
+    }
 
-if (!isset($_SESSION['username'])) {
-    header("Location: Halaman_login.php");
-    exit;
-}
+    require __DIR__ . '/koneksi.php';
+    require __DIR__ . '/../../../vendor/autoload.php';
 
-require __DIR__ . '/koneksi.php';
-require __DIR__ . '/../../../vendor/autoload.php';
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-
-
-// =====================================================
-// BUAT SPREADSHEET
-// =====================================================
-
-$spreadsheet = new Spreadsheet();
-
-$sheet = $spreadsheet->getActiveSheet();
-
-$sheet->setTitle('Planning Export');
+    use PhpOffice\PhpSpreadsheet\Spreadsheet;
+    use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+    use PhpOffice\PhpSpreadsheet\Style\Alignment;
+    use PhpOffice\PhpSpreadsheet\Style\Border;
+    use PhpOffice\PhpSpreadsheet\Style\Fill;
+    use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 
-// =====================================================
-// PENGATURAN GAMBAR
-// =====================================================
-//
-// Tinggi gambar dalam pixel
-$imageHeight = 100;
+    $spreadsheet = new Spreadsheet();
 
-// Jarak antar gambar dalam pixel
-$imageGap = 10;
+    $sheet = $spreadsheet->getActiveSheet();
 
-// Jarak gambar dari border atas
-$imageTopPadding = 8;
-
-// Jarak gambar terakhir dari border bawah
-$imageBottomPadding = 8;
-
-// Perkiraan lebar kolom H dalam pixel
-$columnWidthPixels = 210;
+    $sheet->setTitle('Planning Export');
 
 
-// =====================================================
-// JUDUL
-// =====================================================
+    $imageHeight = 100;
 
-$sheet->mergeCells('A1:J1');
+    $imageGap = 10;
 
-$sheet->setCellValue(
-    'A1',
-    'Planning Export'
-);
+    $imageTopPadding = 8;
 
-$sheet->getStyle('A1')
-    ->getFont()
-    ->setBold(true)
-    ->setSize(16);
+    $imageBottomPadding = 8;
 
-$sheet->getStyle('A1')
-    ->getAlignment()
-    ->setHorizontal(
-        Alignment::HORIZONTAL_CENTER
-    )
-    ->setVertical(
-        Alignment::VERTICAL_CENTER
-    );
-
-$sheet->getRowDimension(1)
-    ->setRowHeight(30);
+    $columnWidthPixels = 210;
 
 
-// =====================================================
-// HEADER
-// =====================================================
-
-$headers = [
-    'No.',
-    'Date',
-    'NUP',
-    'Name',
-    'Division',
-    'Description',
-    'Upload Time',
-    'Image',
-    'Status',
-    'History'
-];
-
-$column = 'A';
-
-foreach ($headers as $header) {
+    $sheet->mergeCells('A1:J1');
 
     $sheet->setCellValue(
-        $column . '3',
-        $header
+        'A1',
+        'Planning Export'
     );
 
-    $column++;
-}
-
-
-// =====================================================
-// STYLE HEADER
-// =====================================================
-
-$headerStyle = $sheet->getStyle('A3:J3');
-
-$headerStyle
-    ->getFont()
-    ->setBold(true);
-
-$headerStyle
-    ->getAlignment()
-    ->setHorizontal(
-        Alignment::HORIZONTAL_CENTER
-    )
-    ->setVertical(
-        Alignment::VERTICAL_CENTER
-    );
-
-$headerStyle
-    ->getFill()
-    ->setFillType(
-        Fill::FILL_SOLID
-    )
-    ->getStartColor()
-    ->setARGB('D9EAF7');
-
-$headerStyle
-    ->getBorders()
-    ->getAllBorders()
-    ->setBorderStyle(
-        Border::BORDER_THIN
-    );
-
-$sheet->getRowDimension(3)
-    ->setRowHeight(25);
-
-
-// =====================================================
-// QUERY DATA
-// =====================================================
-
-$query = "
-    SELECT 
-        p.id,
-        p.tanggal,
-        p.deskripsi,
-        p.time_upload_activity_planning,
-        p.status,
-        p.gambar,
-        p.history_update,
-        u.nup,
-        u.nama,
-        u.divisi
-
-    FROM planning p
-
-    JOIN users u
-        ON p.user_id = u.id
-
-    WHERE u.status = 'Active'
-
-    ORDER BY
-        p.status DESC,
-        p.time_upload_activity_planning ASC
-";
-
-$result = mysqli_query(
-    $koneksi,
-    $query
-);
-
-if (!$result) {
-
-    die(
-        "Query error: " .
-        mysqli_error($koneksi)
-    );
-}
-
-
-// =====================================================
-// ISI DATA
-// =====================================================
-
-$rowNumber = 4;
-
-$no = 1;
-
-while ($row = mysqli_fetch_assoc($result)) {
-
-
-    // =================================================
-    // STATUS
-    // =================================================
-
-    $status = !empty($row['gambar'])
-        ? 'Completed'
-        : 'On-progress';
-
-
-    // =================================================
-    // DATA BIASA
-    // =================================================
-
-    $sheet->setCellValue(
-        'A' . $rowNumber,
-        $no
-    );
-
-    $sheet->setCellValue(
-        'B' . $rowNumber,
-        !empty($row['tanggal'])
-            ? date(
-                'd-m-Y',
-                strtotime($row['tanggal'])
-            )
-            : ''
-    );
-
-    $sheet->setCellValue(
-        'C' . $rowNumber,
-        $row['nup']
-    );
-
-    $sheet->setCellValue(
-        'D' . $rowNumber,
-        $row['nama']
-    );
-
-    $sheet->setCellValue(
-        'E' . $rowNumber,
-        $row['divisi']
-    );
-
-    $sheet->setCellValue(
-        'F' . $rowNumber,
-        $row['deskripsi']
-    );
-
-    $sheet->setCellValue(
-        'G' . $rowNumber,
-        $row['time_upload_activity_planning']
-    );
-
-    $sheet->setCellValue(
-        'I' . $rowNumber,
-        $status
-    );
-
-    $sheet->setCellValue(
-        'J' . $rowNumber,
-        $row['history_update']
-    );
-
-
-    // =================================================
-    // GAMBAR
-    // =================================================
-
-    if (!empty($row['gambar'])) {
-
-        $gambarPaths = explode(
-            ',',
-            $row['gambar']
-        );
-
-        $imageIndex = 0;
-
-
-        foreach ($gambarPaths as $path) {
-
-            $path = trim($path);
-
-
-            // -----------------------------------------
-            // SKIP JIKA KOSONG
-            // -----------------------------------------
-
-            if ($path === '') {
-                continue;
-            }
-
-
-            // -----------------------------------------
-            // LOKASI FILE GAMBAR
-            // -----------------------------------------
-
-            $imagePath =
-                __DIR__ .
-                '/img/' .
-                $path;
-
-
-            // -----------------------------------------
-            // CEK FILE
-            // -----------------------------------------
-
-            if (!file_exists($imagePath)) {
-                continue;
-            }
-
-
-            // -----------------------------------------
-            // CEK UKURAN GAMBAR
-            // -----------------------------------------
-
-            $imageInfo = getimagesize(
-                $imagePath
-            );
-
-
-            if (
-                $imageInfo === false ||
-                empty($imageInfo[0]) ||
-                empty($imageInfo[1])
-            ) {
-                continue;
-            }
-
-
-            // -----------------------------------------
-            // UKURAN ASLI
-            // -----------------------------------------
-
-            $originalWidth =
-                $imageInfo[0];
-
-            $originalHeight =
-                $imageInfo[1];
-
-
-            // -----------------------------------------
-            // HITUNG LEBAR BERDASARKAN RASIO
-            // -----------------------------------------
-
-            $imageWidth =
-                (
-                    $originalWidth /
-                    $originalHeight
-                ) *
-                $imageHeight;
-
-
-            // -----------------------------------------
-            // BUAT DRAWING
-            // -----------------------------------------
-
-            $drawing = new Drawing();
-
-
-            $drawing->setName(
-                'Evidence_' .
-                $no .
-                '_' .
-                $imageIndex
-            );
-
-
-            $drawing->setDescription(
-                'Planning Evidence'
-            );
-
-
-            // -----------------------------------------
-            // PATH GAMBAR
-            // -----------------------------------------
-
-            $drawing->setPath(
-                $imagePath
-            );
-
-
-            // -----------------------------------------
-            // CELL GAMBAR
-            // -----------------------------------------
-
-            $drawing->setCoordinates(
-                'H' . $rowNumber
-            );
-
-
-            // -----------------------------------------
-            // TINGGI GAMBAR
-            // -----------------------------------------
-
-            $drawing->setHeight(
-                $imageHeight
-            );
-
-
-            // -----------------------------------------
-            // POSISI HORIZONTAL
-            // -----------------------------------------
-            //
-            // Foto dibuat berada di tengah kolom H.
-            //
-            // Rumus:
-            //
-            // (lebar kolom - lebar foto) / 2
-            //
-
-            $offsetX =
-                (
-                    $columnWidthPixels -
-                    $imageWidth
-                ) / 2;
-
-
-            // Jangan terlalu dekat dengan border kiri
-
-            if ($offsetX < 8) {
-                $offsetX = 8;
-            }
-
-
-            $drawing->setOffsetX(
-                $offsetX
-            );
-
-
-            // -----------------------------------------
-            // POSISI VERTIKAL
-            // -----------------------------------------
-            //
-            // Foto pertama:
-            //
-            // 8 px
-            //
-            // Foto kedua:
-            //
-            // 8 + 100 + 10
-            // = 118 px
-            //
-            // Foto ketiga:
-            //
-            // 8 + (2 x 110)
-            // = 228 px
-            //
-
-            $offsetY =
-                $imageTopPadding +
-                (
-                    $imageIndex *
-                    (
-                        $imageHeight +
-                        $imageGap
-                    )
-                );
-
-
-            $drawing->setOffsetY(
-                $offsetY
-            );
-
-
-            // -----------------------------------------
-            // MASUKKAN KE WORKSHEET
-            // -----------------------------------------
-
-            $drawing->setWorksheet(
-                $sheet
-            );
-
-
-            $imageIndex++;
-        }
-
-
-        // =================================================
-        // TINGGI ROW BERDASARKAN JUMLAH GAMBAR
-        // =================================================
-
-        if ($imageIndex > 0) {
-
-            /*
-             * Contoh 1 foto:
-             *
-             * 8 px
-             * 100 px foto
-             * 8 px bawah
-             *
-             * Total = 116 px
-             *
-             *
-             * Contoh 2 foto:
-             *
-             * 8 px
-             * 100 px foto
-             * 10 px gap
-             * 100 px foto
-             * 8 px bawah
-             *
-             * Total = 226 px
-             */
-
-
-            $totalHeightPixels =
-                $imageTopPadding +
-                (
-                    $imageIndex *
-                    $imageHeight
-                ) +
-                (
-                    ($imageIndex - 1) *
-                    $imageGap
-                ) +
-                $imageBottomPadding;
-
-
-            /*
-             * Excel menggunakan POINT
-             * untuk row height.
-             *
-             * 1 pixel ≈ 0.75 point
-             */
-
-            $rowHeight =
-                $totalHeightPixels *
-                0.75;
-
-
-            // -----------------------------------------
-            // MINIMAL TINGGI ROW
-            // -----------------------------------------
-
-            if ($rowHeight < 87) {
-                $rowHeight = 87;
-            }
-
-
-            // -----------------------------------------
-            // SET ROW HEIGHT
-            // -----------------------------------------
-
-            $sheet->getRowDimension(
-                $rowNumber
-            )->setRowHeight(
-                $rowHeight
-            );
-        }
-
-
-    } else {
-
-        // =================================================
-        // TIDAK ADA GAMBAR
-        // =================================================
-
-        $sheet->setCellValue(
-            'H' . $rowNumber,
-            'No Image'
-        );
-
-
-        $sheet->getStyle(
-            'H' . $rowNumber
-        )
+    $sheet->getStyle('A1')
+        ->getFont()
+        ->setBold(true)
+        ->setSize(16);
+
+    $sheet->getStyle('A1')
         ->getAlignment()
         ->setHorizontal(
             Alignment::HORIZONTAL_CENTER
@@ -574,255 +56,580 @@ while ($row = mysqli_fetch_assoc($result)) {
             Alignment::VERTICAL_CENTER
         );
 
+    $sheet->getRowDimension(1)
+        ->setRowHeight(30);
 
-        // Tinggi normal
 
-        $sheet->getRowDimension(
-            $rowNumber
-        )->setRowHeight(
-            25
+    $headers = [
+        'No.',
+        'Date',
+        'NUP',
+        'Name',
+        'Division',
+        'Description',
+        'Upload Time',
+        'Image',
+        'Status',
+        'History'
+    ];
+
+    $column = 'A';
+
+    foreach ($headers as $header) {
+
+        $sheet->setCellValue(
+            $column . '3',
+            $header
         );
+
+        $column++;
     }
 
 
-    // =================================================
-    // NEXT ROW
-    // =================================================
+    $headerStyle = $sheet->getStyle('A3:J3');
 
-    $rowNumber++;
+    $headerStyle
+        ->getFont()
+        ->setBold(true);
 
-    $no++;
-}
-
-
-// =====================================================
-// LAST ROW
-// =====================================================
-
-$lastRow =
-    $rowNumber - 1;
-
-
-// =====================================================
-// BORDER DATA
-// =====================================================
-
-if ($lastRow >= 3) {
-
-    $dataStyle =
-        $sheet->getStyle(
-            'A3:J' . $lastRow
+    $headerStyle
+        ->getAlignment()
+        ->setHorizontal(
+            Alignment::HORIZONTAL_CENTER
+        )
+        ->setVertical(
+            Alignment::VERTICAL_CENTER
         );
 
+    $headerStyle
+        ->getFill()
+        ->setFillType(
+            Fill::FILL_SOLID
+        )
+        ->getStartColor()
+        ->setARGB('D9EAF7');
 
-    $dataStyle
+    $headerStyle
         ->getBorders()
         ->getAllBorders()
         ->setBorderStyle(
             Border::BORDER_THIN
         );
 
+    $sheet->getRowDimension(3)
+        ->setRowHeight(25);
 
-    $dataStyle
-        ->getAlignment()
-        ->setVertical(
-            Alignment::VERTICAL_TOP
+
+    $username = $_SESSION['username'];
+    $role     = $_SESSION['role'];
+
+    $query = "
+        SELECT 
+            p.id,
+            p.tanggal,
+            p.deskripsi,
+            p.time_upload_activity_planning,
+            p.status,
+            p.gambar,
+            p.history_update,
+            u.nup,
+            u.nama,
+            u.divisi
+
+        FROM planning p
+
+        JOIN users u
+            ON p.user_id = u.id
+
+        WHERE u.status = 'Active'
+    ";
+
+    // Kalau bukan Super-Admin, hanya export data user yang sedang login
+    if ($role !== 'Super-Admin') {
+        $username_safe = mysqli_real_escape_string($koneksi, $username);
+
+        $query .= "
+            AND u.username = '$username_safe'
+        ";
+    }
+
+    $query .= "
+        ORDER BY
+            p.status DESC,
+            p.time_upload_activity_planning ASC
+    ";
+
+    $result = mysqli_query($koneksi, $query);
+
+    if (!$result) {
+        die(
+            "Query error: " .
+            mysqli_error($koneksi)
         );
-}
+    }
+
+    $result = mysqli_query(
+        $koneksi,
+        $query
+    );
+
+    if (!$result) {
+
+        die(
+            "Query error: " .
+            mysqli_error($koneksi)
+        );
+    }
 
 
-// =====================================================
-// ALIGNMENT
-// =====================================================
+    $rowNumber = 4;
 
-foreach (
-    [
-        'A',
-        'B',
-        'C',
-        'G',
-        'H',
-        'I'
-    ]
-    as $col
-) {
+    $no = 1;
 
-    if ($lastRow >= 4) {
+    while ($row = mysqli_fetch_assoc($result)) {
 
-        $sheet
-            ->getStyle(
-                $col .
-                '4:' .
-                $col .
-                $lastRow
+
+        $status = !empty($row['gambar'])
+            ? 'Completed'
+            : 'On-progress';
+
+
+        $sheet->setCellValue(
+            'A' . $rowNumber,
+            $no
+        );
+
+        $sheet->setCellValue(
+            'B' . $rowNumber,
+            !empty($row['tanggal'])
+                ? date(
+                    'd-m-Y',
+                    strtotime($row['tanggal'])
+                )
+                : ''
+        );
+
+        $sheet->setCellValue(
+            'C' . $rowNumber,
+            $row['nup']
+        );
+
+        $sheet->setCellValue(
+            'D' . $rowNumber,
+            $row['nama']
+        );
+
+        $sheet->setCellValue(
+            'E' . $rowNumber,
+            $row['divisi']
+        );
+
+        $sheet->setCellValue(
+            'F' . $rowNumber,
+            $row['deskripsi']
+        );
+
+        $sheet->setCellValue(
+            'G' . $rowNumber,
+            $row['time_upload_activity_planning']
+        );
+
+        $sheet->setCellValue(
+            'I' . $rowNumber,
+            $status
+        );
+
+        $sheet->setCellValue(
+            'J' . $rowNumber,
+            $row['history_update']
+        );
+
+
+        if (!empty($row['gambar'])) {
+
+            $gambarPaths = explode(
+                ',',
+                $row['gambar']
+            );
+
+            $imageIndex = 0;
+
+
+            foreach ($gambarPaths as $path) {
+
+                $path = trim($path);
+
+
+                if ($path === '') {
+                    continue;
+                }
+
+
+                $imagePath =
+                    __DIR__ .
+                    '/img/' .
+                    $path;
+
+
+                if (!file_exists($imagePath)) {
+                    continue;
+                }
+
+
+                $imageInfo = getimagesize(
+                    $imagePath
+                );
+
+
+                if (
+                    $imageInfo === false ||
+                    empty($imageInfo[0]) ||
+                    empty($imageInfo[1])
+                ) {
+                    continue;
+                }
+
+
+                $originalWidth =
+                    $imageInfo[0];
+
+                $originalHeight =
+                    $imageInfo[1];
+
+
+                $imageWidth =
+                    (
+                        $originalWidth /
+                        $originalHeight
+                    ) *
+                    $imageHeight;
+
+
+                $drawing = new Drawing();
+
+
+                $drawing->setName(
+                    'Evidence_' .
+                    $no .
+                    '_' .
+                    $imageIndex
+                );
+
+
+                $drawing->setDescription(
+                    'Planning Evidence'
+                );
+
+
+                $drawing->setPath(
+                    $imagePath
+                );
+
+
+                $drawing->setCoordinates(
+                    'H' . $rowNumber
+                );
+
+
+                $drawing->setHeight(
+                    $imageHeight
+                );
+
+
+                $offsetX =
+                    (
+                        $columnWidthPixels -
+                        $imageWidth
+                    ) / 2;
+
+
+                if ($offsetX < 8) {
+                    $offsetX = 8;
+                }
+
+
+                $drawing->setOffsetX(
+                    $offsetX
+                );
+
+
+                $offsetY =
+                    $imageTopPadding +
+                    (
+                        $imageIndex *
+                        (
+                            $imageHeight +
+                            $imageGap
+                        )
+                    );
+
+
+                $drawing->setOffsetY(
+                    $offsetY
+                );
+
+
+                $drawing->setWorksheet(
+                    $sheet
+                );
+
+
+                $imageIndex++;
+            }
+
+
+            if ($imageIndex > 0) {
+
+
+                $totalHeightPixels =
+                    $imageTopPadding +
+                    (
+                        $imageIndex *
+                        $imageHeight
+                    ) +
+                    (
+                        ($imageIndex - 1) *
+                        $imageGap
+                    ) +
+                    $imageBottomPadding;
+
+
+                $rowHeight =
+                    $totalHeightPixels *
+                    0.75;
+
+
+                if ($rowHeight < 87) {
+                    $rowHeight = 87;
+                }
+
+
+                $sheet->getRowDimension(
+                    $rowNumber
+                )->setRowHeight(
+                    $rowHeight
+                );
+            }
+
+
+        } else {
+
+
+            $sheet->setCellValue(
+                'H' . $rowNumber,
+                'No Image'
+            );
+
+
+            $sheet->getStyle(
+                'H' . $rowNumber
             )
             ->getAlignment()
             ->setHorizontal(
                 Alignment::HORIZONTAL_CENTER
+            )
+            ->setVertical(
+                Alignment::VERTICAL_CENTER
+            );
+
+
+            $sheet->getRowDimension(
+                $rowNumber
+            )->setRowHeight(
+                25
+            );
+        }
+
+
+        $rowNumber++;
+
+        $no++;
+    }
+
+
+    $lastRow =
+        $rowNumber - 1;
+
+
+    if ($lastRow >= 3) {
+
+        $dataStyle =
+            $sheet->getStyle(
+                'A3:J' . $lastRow
+            );
+
+
+        $dataStyle
+            ->getBorders()
+            ->getAllBorders()
+            ->setBorderStyle(
+                Border::BORDER_THIN
+            );
+
+
+        $dataStyle
+            ->getAlignment()
+            ->setVertical(
+                Alignment::VERTICAL_TOP
             );
     }
-}
 
 
-// =====================================================
-// VERTICAL CENTER KOLOM GAMBAR
-// =====================================================
+    foreach (
+        [
+            'A',
+            'B',
+            'C',
+            'G',
+            'H',
+            'I'
+        ]
+        as $col
+    ) {
 
-if ($lastRow >= 4) {
+        if ($lastRow >= 4) {
 
-    $sheet
-        ->getStyle(
-            'H4:H' . $lastRow
-        )
-        ->getAlignment()
-        ->setHorizontal(
-            Alignment::HORIZONTAL_CENTER
-        )
-        ->setVertical(
-            Alignment::VERTICAL_CENTER
-        );
-}
+            $sheet
+                ->getStyle(
+                    $col .
+                    '4:' .
+                    $col .
+                    $lastRow
+                )
+                ->getAlignment()
+                ->setHorizontal(
+                    Alignment::HORIZONTAL_CENTER
+                );
+        }
+    }
 
-
-// =====================================================
-// TEXT WRAP
-// =====================================================
-
-foreach (
-    [
-        'F',
-        'J'
-    ]
-    as $col
-) {
 
     if ($lastRow >= 4) {
 
         $sheet
             ->getStyle(
-                $col .
-                '4:' .
-                $col .
-                $lastRow
+                'H4:H' . $lastRow
             )
             ->getAlignment()
-            ->setWrapText(true);
+            ->setHorizontal(
+                Alignment::HORIZONTAL_CENTER
+            )
+            ->setVertical(
+                Alignment::VERTICAL_CENTER
+            );
     }
-}
 
 
-// =====================================================
-// LEBAR KOLOM
-// =====================================================
+    foreach (
+        [
+            'F',
+            'J'
+        ]
+        as $col
+    ) {
 
-$sheet
-    ->getColumnDimension('A')
-    ->setWidth(5);
+        if ($lastRow >= 4) {
 
-$sheet
-    ->getColumnDimension('B')
-    ->setWidth(12);
-
-$sheet
-    ->getColumnDimension('C')
-    ->setWidth(12);
-
-$sheet
-    ->getColumnDimension('D')
-    ->setWidth(25);
-
-$sheet
-    ->getColumnDimension('E')
-    ->setWidth(15);
-
-$sheet
-    ->getColumnDimension('F')
-    ->setWidth(40);
-
-$sheet
-    ->getColumnDimension('G')
-    ->setWidth(15);
+            $sheet
+                ->getStyle(
+                    $col .
+                    '4:' .
+                    $col .
+                    $lastRow
+                )
+                ->getAlignment()
+                ->setWrapText(true);
+        }
+    }
 
 
-// =====================================================
-// KOLOM GAMBAR
-// =====================================================
+    $sheet
+        ->getColumnDimension('A')
+        ->setWidth(5);
 
-$sheet
-    ->getColumnDimension('H')
-    ->setWidth(30);
+    $sheet
+        ->getColumnDimension('B')
+        ->setWidth(12);
 
+    $sheet
+        ->getColumnDimension('C')
+        ->setWidth(12);
 
-$sheet
-    ->getColumnDimension('I')
-    ->setWidth(15);
+    $sheet
+        ->getColumnDimension('D')
+        ->setWidth(25);
 
-$sheet
-    ->getColumnDimension('J')
-    ->setWidth(12);
+    $sheet
+        ->getColumnDimension('E')
+        ->setWidth(15);
 
+    $sheet
+        ->getColumnDimension('F')
+        ->setWidth(40);
 
-// =====================================================
-// FREEZE HEADER
-// =====================================================
-
-$sheet->freezePane('A4');
-
-
-// =====================================================
-// FILTER
-// =====================================================
-
-if ($lastRow >= 3) {
-
-    $sheet->setAutoFilter(
-        'A3:J' . $lastRow
-    );
-}
+    $sheet
+        ->getColumnDimension('G')
+        ->setWidth(15);
 
 
-// =====================================================
-// DOWNLOAD XLSX
-// =====================================================
-
-$filename =
-    'planning_data_' .
-    date('Y-m-d_H-i-s') .
-    '.xlsx';
+    $sheet
+        ->getColumnDimension('H')
+        ->setWidth(30);
 
 
-header(
-    'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-);
+    $sheet
+        ->getColumnDimension('I')
+        ->setWidth(15);
+
+    $sheet
+        ->getColumnDimension('J')
+        ->setWidth(12);
 
 
-header(
-    'Content-Disposition: attachment; filename="' .
-    $filename .
-    '"'
-);
+    $sheet->freezePane('A4');
 
 
-header(
-    'Cache-Control: max-age=0'
-);
+    if ($lastRow >= 3) {
+
+        $sheet->setAutoFilter(
+            'A3:J' . $lastRow
+        );
+    }
 
 
-// =====================================================
-// SAVE
-// =====================================================
+    $filename =
+        'planning_data_' .
+        date('Y-m-d_H-i-s') .
+        '.xlsx';
 
-$writer =
-    new Xlsx(
-        $spreadsheet
+
+    header(
+        'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
 
 
-$writer->save(
-    'php://output'
-);
+    header(
+        'Content-Disposition: attachment; filename="' .
+        $filename .
+        '"'
+    );
 
 
-exit;
+    header(
+        'Cache-Control: max-age=0'
+    );
 
+
+    $writer =
+        new Xlsx(
+            $spreadsheet
+        );
+
+
+    $writer->save(
+        'php://output'
+    );
+
+
+    exit;
 ?>

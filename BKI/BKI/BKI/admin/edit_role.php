@@ -57,13 +57,30 @@
             </script>";
         }
     }
+
+    $imageName = trim($image);
+    $imagePath = '';
+
+    $extensions = ['jpg', 'jpeg', 'png', 'webp', 'heic'];
+
+    foreach ($extensions as $ext) {
+        $filePath = __DIR__ . '/img/' . $imageName . '.' . $ext;
+
+        if (file_exists($filePath)) {
+            $imagePath = 'img/' . $imageName . '.' . $ext;
+            break;
+        }
+    }
+
+    if ($imagePath === '') {
+        $imagePath = 'img/default.png';
+    }
 ?>
 
 <!DOCTYPE html>
 
 <html class="loading semi-dark-layout" lang="en" data-layout="semi-dark-layout" data-textdirection="ltr">
 
-<!-- BEGIN: Head-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -75,26 +92,25 @@
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+    <!-- BEGIN: Vendor CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
+    <!-- END: Vendor CSS -->
 
-    <!-- BEGIN: Theme CSS-->
+    <!-- BEGIN: Theme CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/themes/semi-dark-layout.css">
+    <!-- END: Theme CSS -->
 
-    <!-- BEGIN: Page CSS-->
+    <!-- BEGIN: Page CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/core/menu/menu-types/vertical-menu.css">
-    <!-- END: Page CSS-->
+    <!-- END: Page CSS -->
 
-    <!-- BEGIN: Custom CSS-->
+    <!-- BEGIN: Custom CSS -->
     <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css">
-    <!-- END: Custom CSS-->
-
-    <link rel="stylesheet" href="sweetalert2.min.css">
+    <!-- END: Custom CSS -->
 
     <style>
         .btn-info {
@@ -104,12 +120,19 @@
             padding: 12px 24px;
             text-decoration: none;
         }
+        .profile-navbar-img {
+            width: 40px !important;
+            height: 40px !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            border-radius: 50% !important;
+        }
     </style>
 </head>
 
 <body class="vertical-layout vertical-menu-modern  navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="">
 
-    <!-- BEGIN: Header-->
+    <!-- BEGIN: Header -->
     <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow container-xxl">
         <div class="navbar-container d-flex content">
             <div class="d-flex align-items-center">
@@ -120,7 +143,7 @@
 
             <ul class="nav navbar-nav align-items-center ms-auto">
                 <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round" src="img/<?php echo $image; ?>" alt="" height="40" width="40"><span class="avatar-status-online"></span></span>
+                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round profile-navbar-img" src="<?php echo htmlspecialchars($imagePath); ?>" alt="Profile"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user"><a class="dropdown-item" href="profile.php"><i class="me-50" data-feather="user"></i> Profile</a>
                     <?php if (is_user()): ?>
@@ -132,9 +155,9 @@
             </ul>
         </div>
     </nav>
-    <!-- END: Header-->
+    <!-- END: Header -->
 
-    <!-- BEGIN: Main Menu-->
+    <!-- BEGIN: Main Menu -->
     <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
@@ -169,9 +192,9 @@
             </div>
         </div>
     </div>
-    <!-- END: Main Menu-->
+    <!-- END: Main Menu -->
 
-    <!-- BEGIN: Content-->
+    <!-- BEGIN: Content -->
     <div class="app-content content ">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
@@ -179,7 +202,7 @@
             <div class="content-header row">
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
-                        <h2 class="float-start mb-0">Form Role</h2>
+                        <h2 class="float-start mb-0">Edit - Form Role</h2>
                     </div>
                 </div>
             </div>
@@ -202,13 +225,13 @@
                                             <div class="col-6">
                                                 <div class="mb-1">
                                                     <label for="nup" class="form-label">NUP</label>
-                                                    <input type="text" class="form-control" name="nup" placeholder="Number" value="<?=$row['nup'] ?>" required />
+                                                    <input type="text" class="form-control" id="nup" name="nup" placeholder="Number" value="<?=$row['nup'] ?>" required />
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="mb-1">
                                                     <label for="nama" class="form-label">Name</label>
-                                                    <input type="text" class="form-control" name="nama" placeholder="Full Name" value="<?=$row['nama'] ?>" required />
+                                                    <input type="text" class="form-control" id="nama" name="nama" placeholder="Full Name" value="<?=$row['nama'] ?>" required />
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -216,25 +239,25 @@
                                                     <label for="divisi" class="form-label">Division</label>
                                                     <select class="form-control" id="divisi" name="divisi" required>
                                                         <option value="">-</option>
-                                                        <option value="Inspector" <?= $row['divisi'] === 'Inspector' ? 'selected' : '' ?>>Inspector</option>
-                                                        <option value="General" <?= $row['divisi'] === 'General' ? 'selected' : '' ?>>General</option>
-                                                        <option value="HSE" <?= $row['divisi'] === 'HSE' ? 'selected' : '' ?>>HSE</option>
+                                                        <option value="Admin" <?= $row['divisi'] === 'General' ? 'selected' : '' ?>>Admin</option>
                                                         <option value="Finance" <?= $row['divisi'] === 'Finance' ? 'selected' : '' ?>>Finance</option>
+                                                        <option value="HSE" <?= $row['divisi'] === 'HSE' ? 'selected' : '' ?>>HSE</option>
+                                                        <option value="Inspector" <?= $row['divisi'] === 'Inspector' ? 'selected' : '' ?>>Inspector</option>
+                                                        <option value="Information Technology" <?= $row['divisi'] === 'IT' ? 'selected' : '' ?>>Information Technology</option>
                                                         <option value="Marketing" <?= $row['divisi'] === 'Marketing' ? 'selected' : '' ?>>Marketing</option>
-                                                        <option value="IT" <?= $row['divisi'] === 'IT' ? 'selected' : '' ?>>IT</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="mb-1">
                                                     <label for="username" class="form-label">Username</label>
-                                                    <input type="text" class="form-control" name="username" placeholder="Username" value="<?=$row['username'] ?>" required />
+                                                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="<?=$row['username'] ?>" autocomplete="username" required />
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="mb-1">
                                                     <label for="password" class="form-label">Password</label>
-                                                    <input type="password" class="form-control" name="password" placeholder="New Password" />
+                                                    <input type="password" class="form-control" id="password" name="password" placeholder="New Password" autocomplete="new-password" />
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -261,26 +284,26 @@
             </div>
         </div>
     </div>
-    <!-- END: Content-->
+    <!-- END: Content -->
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-    <!-- BEGIN: Footer-->
+    <!-- BEGIN: Footer -->
     <footer class="footer footer-static footer-light">
         <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
-    <!-- END: Footer-->
+    <!-- END: Footer -->
 
-    <!-- BEGIN: Vendor JS-->
+    <!-- BEGIN: Vendor JS -->
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    <!-- BEGIN Vendor JS-->
+    <!-- END: Vendor JS -->
 
-    <!-- BEGIN: Theme JS-->
+    <!-- BEGIN: Theme JS -->
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    <!-- END: Theme JS-->
+    <!-- END: Theme JS -->
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -305,46 +328,6 @@
     </script>
 
     <script>
-        function sendGeotagging(type) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const data = {
-                        type: type,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-
-                    fetch('simpan_geotagging.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log(`Geotagging ${type} berhasil disimpan`);
-                            if (type === 'login') {
-                                getGeotaggingData();
-                            }
-                        } else {
-                            console.error(`Gagal menyimpan geotagging ${type}:`, data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }, function(error) {
-                    console.error('Error:', error);
-                }, { enableHighAccuracy: true });
-            } else {
-                console.error('Geolocation tidak didukung oleh browser ini.');
-            }
-        }
-        
-        sendGeotagging('login');
-
         function getGeolocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {

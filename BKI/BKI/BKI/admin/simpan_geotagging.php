@@ -29,7 +29,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
 
         if (isset($data['latitude']) && isset($data['longitude']) && isset($data['type'])) {
-            $latitude = $data['latitude'];
+            $latitude  = $data['latitude'];
             $longitude = $data['longitude'];
             $type = $data['type'];
 

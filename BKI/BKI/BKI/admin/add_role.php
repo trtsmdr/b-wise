@@ -11,6 +11,24 @@
     $role  = $_SESSION['role'];
     $image = $_SESSION['image'];
 
+    $imageName = trim($image);
+    $imagePath = '';
+
+    $extensions = ['jpg', 'jpeg', 'png', 'webp', 'heic'];
+
+    foreach ($extensions as $ext) {
+        $filePath = __DIR__ . '/img/' . $imageName . '.' . $ext;
+
+        if (file_exists($filePath)) {
+            $imagePath = 'img/' . $imageName . '.' . $ext;
+            break;
+        }
+    }
+
+    if ($imagePath === '') {
+        $imagePath = 'img/default.png';
+    }
+
     function is_user() {
         return $_SESSION['role'] === 'User';
     }
@@ -55,28 +73,29 @@
     <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
-    <title>BKI - Add Data</title>
+    <title>BKI - Role</title>
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <!-- BEGIN: Vendor CSS-->
+    <!-- BEGIN: Vendor CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
+    <!-- END: Vendor CSS -->
 
-    <!-- BEGIN: Theme CSS-->
+    <!-- BEGIN: Theme CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/colors.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/components.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/themes/semi-dark-layout.css">
+    <!-- END: Theme CSS -->
 
-    <!-- BEGIN: Page CSS-->
+    <!-- BEGIN: Page CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/core/menu/menu-types/vertical-menu.css">
-    <!-- END: Page CSS-->
+    <!-- END: Page CSS -->
 
-    <!-- BEGIN: Custom CSS-->
+    <!-- BEGIN: Custom CSS -->
     <link rel="stylesheet" type="text/css" href="../../../assets/css/style.css">
-    <!-- END: Custom CSS-->
+    <!-- END: Custom CSS -->
 
     <style>
         .btn-primary {
@@ -86,12 +105,19 @@
             padding: 12px 24px;
             text-decoration: none;
         }
+        .profile-navbar-img {
+            width: 40px !important;
+            height: 40px !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            border-radius: 50% !important;
+        }
     </style>
 </head>
 
 <body class="vertical-layout vertical-menu-modern  navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="">
 
-    <!-- BEGIN: Header-->
+    <!-- BEGIN: Header -->
     <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow container-xxl">
         <div class="navbar-container d-flex content">
             <div class="d-flex align-items-center">
@@ -102,7 +128,7 @@
 
             <ul class="nav navbar-nav align-items-center ms-auto">
                 <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round" src="img/<?php echo $image; ?>" alt="" height="40" width="40"><span class="avatar-status-online"></span></span>
+                        <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder"><?php echo $nama; ?></span><span class="user-status"><?php echo $role; ?></span></div><span class="avatar"><img class="round profile-navbar-img" src="<?php echo htmlspecialchars($imagePath); ?>" alt="Profile"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user"><a class="dropdown-item" href="profile.php"><i class="me-50" data-feather="user"></i> Profile</a>
                         <?php if (is_user()): ?>
@@ -114,9 +140,9 @@
             </ul>
         </div>
     </nav>
-    <!-- END: Header-->
+    <!-- END: Header -->
 
-    <!-- BEGIN: Main Menu-->
+    <!-- BEGIN: Main Menu -->
     <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
@@ -139,7 +165,7 @@
                             </li>
                             <li><a class="d-flex align-items-center" href="planning.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Planning">Planning</span></a>
                             </li>
-                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Avident">Evidence</span></a>
+                            <li><a class="d-flex align-items-center" href="avident.php"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Evidence">Evidence</span></a>
                             </li>
                         </ul>
                     </li><br>
@@ -151,9 +177,9 @@
             </div>
         </div>
     </div>
-    <!-- END: Main Menu-->
+    <!-- END: Main Menu -->
 
-    <!-- BEGIN: Content-->
+    <!-- BEGIN: Content -->
     <div class="app-content content ">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
@@ -196,12 +222,12 @@
                                                     <label for="divisi" class="form-label">Division</label>
                                                     <select class="form-control" id="divisi" name="divisi" required>
                                                         <option value="">-</option>
-                                                        <option value="Inspector">Inspector</option>
-                                                        <option value="General">Admin</option>
-                                                        <option value="HSE">HSE</option>
+                                                        <option value="Admin">Admin</option>
                                                         <option value="Finance">Finance</option>
+                                                        <option value="HSE">HSE</option>
+                                                        <option value="Inspector">Inspector</option>
+                                                        <option value="Information Technology">Information Technology</option>
                                                         <option value="Marketing">Marketing</option>
-                                                       <option value="IT">IT</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -241,26 +267,26 @@
             </div>
         </div>
     </div>
-    <!-- END: Content-->
+    <!-- END: Content -->
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-    <!-- BEGIN: Footer-->
+    <!-- BEGIN: Footer -->
     <footer class="footer footer-static footer-light">
         <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">&copy; Biro Klasifikasi Indonesia <span class="d-none d-sm-inline-block">2026</span></span></p>
     </footer>
     <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
-    <!-- END: Footer-->
+    <!-- END: Footer -->
 
-    <!-- BEGIN: Vendor JS-->
+    <!-- BEGIN: Vendor JS -->
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    <!-- BEGIN Vendor JS-->
+    <!-- END: Vendor JS -->
 
-    <!-- BEGIN: Theme JS-->
+    <!-- BEGIN: Theme JS -->
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    <!-- END: Theme JS-->
+    <!-- END: Theme JS -->
      
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
