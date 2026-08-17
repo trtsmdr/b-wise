@@ -145,6 +145,14 @@
         ->setRowHeight(25);
 
 
+    $username = $_SESSION['username'];
+    $role     = $_SESSION['role'];
+
+    $username_safe = mysqli_real_escape_string(
+        $koneksi,
+        $username
+    );
+
     $query = "
         SELECT 
             p.id,
@@ -165,11 +173,32 @@
 
         WHERE p.tanggal = '$export_date'
         AND u.status = 'Active'
+    ";
 
+    // Selain Super-Admin hanya boleh export data sendiri
+    if ($role !== 'Super-Admin') {
+        $query .= "
+            AND u.username = '$username_safe'
+        ";
+    }
+
+    $query .= "
         ORDER BY
             p.status DESC,
             p.time_upload_activity_planning ASC
     ";
+
+    $result = mysqli_query(
+        $koneksi,
+        $query
+    );
+
+    if (!$result) {
+        die(
+            "Query error: " .
+            mysqli_error($koneksi)
+        );
+    }
 
 
     $result = mysqli_query(
@@ -632,7 +661,7 @@
 
     $sheet
         ->getColumnDimension('J')
-        ->setWidth(1);
+        ->setWidth(12);
 
 
     $sheet->freezePane(

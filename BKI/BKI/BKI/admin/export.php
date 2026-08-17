@@ -120,6 +120,9 @@
         ->setRowHeight(25);
 
 
+    $username = $_SESSION['username'];
+    $role     = $_SESSION['role'];
+
     $query = "
         SELECT 
             p.id,
@@ -139,11 +142,31 @@
             ON p.user_id = u.id
 
         WHERE u.status = 'Active'
+    ";
 
+    // Kalau bukan Super-Admin, hanya export data user yang sedang login
+    if ($role !== 'Super-Admin') {
+        $username_safe = mysqli_real_escape_string($koneksi, $username);
+
+        $query .= "
+            AND u.username = '$username_safe'
+        ";
+    }
+
+    $query .= "
         ORDER BY
             p.status DESC,
             p.time_upload_activity_planning ASC
     ";
+
+    $result = mysqli_query($koneksi, $query);
+
+    if (!$result) {
+        die(
+            "Query error: " .
+            mysqli_error($koneksi)
+        );
+    }
 
     $result = mysqli_query(
         $koneksi,

@@ -296,13 +296,13 @@
                                         <tr style="text-align: center;">
                                             <th>No.</th>
                                             <th style="min-width: 150px;">Date</th>
-                                            <th>NUP</th>
-                                            <th style="min-width: 250px;">Name</th>
-                                            <th>Division</th>
+                                            <th style="min-width: 150px;">NUP</th>
+                                            <th style="min-width: 350px;">Name</th>
+                                            <th style="min-width: 150px;">Division</th>
                                             <th style="min-width: 250px;">Image</th>
-                                            <th style="min-width: 250px;">Description</th>
+                                            <th style="min-width: 350px;">Description</th>
                                             <th style="min-width: 150px;">Upload Time</th>
-                                            <th style="min-width: 200px;">Collection Duration</th>
+                                            <th style="min-width: 250px;">Collection Duration</th>
                                             <th style="min-width: 150px;">Status</th>
                                             <?php if (is_superadmin()): ?>
                                             <th style="min-width: 250px;">Action</th>

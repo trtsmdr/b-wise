@@ -331,7 +331,7 @@
                                             <th style="min-width: 150px;">NUP</th>
                                             <th style="min-width: 350px;">Name</th>
                                             <th style="min-width: 150px;">Division</th>
-                                            <th style="min-width: 500px;">Description</th>
+                                            <th style="min-width: 350px;">Description</th>
                                             <th style="min-width: 150px;">Upload Time</th>
                                             <th style="min-width: 250px;">Image</th>
                                             <th style="min-width: 150px;">Status</th>
