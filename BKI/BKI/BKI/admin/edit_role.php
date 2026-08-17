@@ -239,11 +239,11 @@
                                                     <label for="divisi" class="form-label">Division</label>
                                                     <select class="form-control" id="divisi" name="divisi" required>
                                                         <option value="">-</option>
-                                                        <option value="Admin" <?= $row['divisi'] === 'General' ? 'selected' : '' ?>>Admin</option>
+                                                        <option value="Admin" <?= $row['divisi'] === 'Admin' ? 'selected' : '' ?>>Admin</option>
                                                         <option value="Finance" <?= $row['divisi'] === 'Finance' ? 'selected' : '' ?>>Finance</option>
                                                         <option value="HSE" <?= $row['divisi'] === 'HSE' ? 'selected' : '' ?>>HSE</option>
                                                         <option value="Inspector" <?= $row['divisi'] === 'Inspector' ? 'selected' : '' ?>>Inspector</option>
-                                                        <option value="Information Technology" <?= $row['divisi'] === 'IT' ? 'selected' : '' ?>>Information Technology</option>
+                                                        <option value="Information Technology" <?= $row['divisi'] === 'Information Technology' ? 'selected' : '' ?>>Information Technology</option>
                                                         <option value="Marketing" <?= $row['divisi'] === 'Marketing' ? 'selected' : '' ?>>Marketing</option>
                                                     </select>
                                                 </div>
