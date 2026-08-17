@@ -162,12 +162,6 @@
                                             <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
                                         </div>
                                     </div>
-                                    <div class="mb-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="remember-me" tabindex="3" />
-                                            <label class="form-check-label" for="remember-me"> Remember me </label>
-                                        </div>
-                                    </div>
                                     <input type="hidden" name="latitude" id="latitude">
                                     <input type="hidden" name="longitude" id="longitude">
 
