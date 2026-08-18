@@ -293,10 +293,27 @@
                                             while ($row = $result->fetch_assoc()) {
                                                 $is_time_off = !empty($row['time_off_id']);
                                                 $time_logout_display = $row['time_logout'] ? htmlspecialchars($row['time_logout']) : date('H:i:s');
-                                                $geotagging = htmlspecialchars($row['geotagging'] ?? ''); 
+
+                                                $geotagging = htmlspecialchars($row['geotagging'] ?? '');
                                                 $geotagging_array = explode(',', $geotagging);
-                                                $latitude   = $geotagging_array[0] ?? '';
-                                                $longitude  = $geotagging_array[1] ?? '';
+                                                $latitude = $geotagging_array[0] ?? '';
+                                                $longitude = $geotagging_array[1] ?? '';
+
+                                                $geotagging_logout = htmlspecialchars($row['geotagging_logout'] ?? '');
+                                                $geotagging_logout_array = explode(',', $geotagging_logout);
+                                                $logout_latitude = $geotagging_logout_array[0] ?? '';
+                                                $logout_longitude = $geotagging_logout_array[1] ?? '';
+
+                                                $geotagging_before_break = htmlspecialchars($row['geotagging_before_break'] ?? '');
+                                                $geotagging_before_break_array = explode(',', $geotagging_before_break);
+                                                $before_break_latitude = $geotagging_before_break_array[0] ?? '';
+                                                $before_break_longitude = $geotagging_before_break_array[1] ?? '';
+
+                                                $geotagging_after_break = htmlspecialchars($row['geotagging_after_break'] ?? '');
+                                                $geotagging_after_break_array = explode(',', $geotagging_after_break);
+                                                $after_break_latitude = $geotagging_after_break_array[0] ?? '';
+                                                $after_break_longitude = $geotagging_after_break_array[1] ?? '';
+                                                
                                                 $absence_label = '-';
                                                 if (!empty($row['absence_type'])) {
                                                     $absence_label = htmlspecialchars($row['absence_type']);
@@ -365,14 +382,14 @@
                                                 echo "</td>
                                                     <td>{$before_break_display}";
                                                 if (!$is_time_off && !empty($row['geotagging_before_break'])) {
-                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($row['before_break'] ?? '') . "' style='margin-left: 10px;'>
+                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$before_break_latitude}' data-lng='{$before_break_longitude}' data-time='" . htmlspecialchars($row['before_break'] ?? '') . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
                                                 echo "</td>
                                                     <td>{$after_break_display}";
                                                 if (!$is_time_off && !empty($row['geotagging_after_break'])) {
-                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($row['after_break'] ?? '') . "' style='margin-left: 10px;'>
+                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$after_break_latitude}' data-lng='{$after_break_longitude}' data-time='" . htmlspecialchars($row['after_break'] ?? '') . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
@@ -384,7 +401,7 @@
                                                     echo htmlspecialchars($row['time_logout']);
                                                 }
                                                 if (!$is_time_off && !empty($row['geotagging_logout'])) {
-                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$latitude}' data-lng='{$longitude}' data-time='" . htmlspecialchars($time_logout_display) . "' style='margin-left: 10px;'>
+                                                    echo "<a href='#' class='geotagging-link' data-bs-toggle='modal' data-bs-target='#mapModal' data-lat='{$logout_latitude}' data-lng='{$logout_longitude}' data-time='" . htmlspecialchars($time_logout_display) . "' style='margin-left: 10px;'>
                                                             <i class='fa fa-map-location'></i>
                                                         </a>";
                                                 }
