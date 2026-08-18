@@ -28,11 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout_after_attendan
         exit;
     }
 
-    if ($_SESSION['role'] !== 'User') {
-        header("Location: dashboard.php");
-        exit;
-    }
-
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header("Location: pilih_kehadiran.php");
         exit;

@@ -14,22 +14,10 @@
         exit;
     }
 
-    if ($_SESSION['role'] !== 'User') {
-        header("Location: dashboard.php");
-        exit;
-    }
-
     $user_id = (int) $_SESSION['user_id'];
     $today = date('Y-m-d');
 
-    $check_attendance_query = "
-        SELECT id
-        FROM time
-        WHERE user_id = $user_id
-        AND tanggal = '$today'
-        LIMIT 1
-    ";
-
+    $check_attendance_query = "SELECT id FROM time WHERE user_id = $user_id AND tanggal = '$today' LIMIT 1";
     $check_attendance_result = mysqli_query($koneksi, $check_attendance_query);
 
     if ($check_attendance_result && mysqli_num_rows($check_attendance_result) > 0 && !isset($_SESSION['attendance_alert'])) {
@@ -52,7 +40,6 @@
     <title>BKI - Select Attendance</title>
     <link href="img/logo.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
-
     <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/vendors.min.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="../../../app-assets/css/bootstrap-extended.css">
@@ -126,8 +113,8 @@
                     <?php endif; ?>
 
                     <form action="proses_kehadiran.php" method="POST" enctype="multipart/form-data" id="attendanceForm">
-                        <input type="hidden" name="latitude" id="latitude" value="<?php echo htmlspecialchars($_SESSION['login_latitude'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                        <input type="hidden" name="longitude" id="longitude" value="<?php echo htmlspecialchars($_SESSION['login_longitude'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="hidden" name="latitude" id="latitude" value="">
+                        <input type="hidden" name="longitude" id="longitude" value="">
 
                         <div class="row g-1 mb-2">
                             <div class="col-md-4">
@@ -175,7 +162,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-2">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" id="submitAttendance">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -184,10 +171,8 @@
     </div>
 
     <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
-    
     <script src="../../../app-assets/js/core/app-menu.js"></script>
     <script src="../../../app-assets/js/core/app.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -220,7 +205,6 @@
             const isTimeOff = value === 'Sick' || value === 'Permission/Leave';
 
             section.style.display = isTimeOff ? 'block' : 'none';
-
             startDate.required = isTimeOff;
             endDate.required = isTimeOff;
             evidence.required = isTimeOff;
@@ -257,13 +241,80 @@
             });
         });
 
-        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
-            const selectedInput = document.querySelector('input[name="attendance_type"]:checked');
-            const selected = selectedInput ? selectedInput.value : 'masuk';
+        const attendanceForm = document.getElementById('attendanceForm');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const submitAttendance = document.getElementById('submitAttendance');
 
-            if (selected === 'masuk') {
+        let locationAllowed = false;
+        let locationRequestInProgress = false;
+
+        function getLocation(callback) {
+            if (!navigator.geolocation) {
+                locationAllowed = false;
+                callback(false);
                 return;
             }
+
+            locationRequestInProgress = true;
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    latitudeInput.value = position.coords.latitude;
+                    longitudeInput.value = position.coords.longitude;
+                    locationAllowed = true;
+                    locationRequestInProgress = false;
+                    callback(true);
+                },
+                function(error) {
+                    latitudeInput.value = '';
+                    longitudeInput.value = '';
+                    locationAllowed = false;
+                    locationRequestInProgress = false;
+                    callback(false);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        attendanceForm.addEventListener('submit', function(e) {
+            if (locationRequestInProgress) {
+                e.preventDefault();
+                return;
+            }
+
+            if (!latitudeInput.value || !longitudeInput.value || !locationAllowed) {
+                e.preventDefault();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Location Required',
+                    text: 'Please enable your location permission before submitting attendance.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(function() {
+                    getLocation(function(success) {
+                        if (success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Location detected',
+                                text: 'You can now submit your attendance.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                });
+
+                return;
+            }
+
+            const selectedInput = document.querySelector('input[name="attendance_type"]:checked');
+            const selected = selectedInput ? selectedInput.value : 'masuk';
 
             if (selected === 'Sick' || selected === 'Permission/Leave') {
                 const startValue = document.getElementById('start_date').value;
@@ -299,6 +350,8 @@
                     return;
                 }
             }
+
+            submitAttendance.disabled = true;
         });
 
         toggleTimeOffFields('masuk');
@@ -308,10 +361,7 @@
         });
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('latitude').value = position.coords.latitude;
-                document.getElementById('longitude').value = position.coords.longitude;
-            });
+            getLocation(function() {});
         }
 
         if (window.history && window.history.pushState) {
@@ -359,6 +409,6 @@
     </script>
     <?php unset($_SESSION['attendance_alert']); ?>
     <?php endif; ?>
-    
+
 </body>
 </html>

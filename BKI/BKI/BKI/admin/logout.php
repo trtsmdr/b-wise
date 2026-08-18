@@ -52,83 +52,87 @@ $geotagging = $latitude . ',' . $longitude;
 if (isset($_SESSION['user_id'])) {
     $user_id = (int) $_SESSION['user_id'];
     $tanggal = date('Y-m-d');
+    $time_logout = date('H:i:s');
 
-    if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
-        $check_time_off_query = "
-            SELECT id
-            FROM time_off
-            WHERE user_id = $user_id
-            AND '$tanggal' BETWEEN start_date AND end_date
-            LIMIT 1
-        ";
-        $time_off_result = mysqli_query($koneksi, $check_time_off_query);
+    $check_time_off_query = "
+        SELECT id
+        FROM time_off
+        WHERE user_id = $user_id
+        AND '$tanggal' BETWEEN start_date AND end_date
+        LIMIT 1
+    ";
 
-        if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
-            session_unset();
-            session_destroy();
+    $time_off_result = mysqli_query($koneksi, $check_time_off_query);
 
-            if (ini_get('session.use_cookies')) {
-                $params = session_get_cookie_params();
-                setcookie(
-                    session_name(),
-                    '',
-                    time() - 42000,
-                    $params['path'],
-                    $params['domain'],
-                    $params['secure'],
-                    $params['httponly']
-                );
-            }
+    if ($time_off_result && mysqli_num_rows($time_off_result) > 0) {
+        session_unset();
+        session_destroy();
 
-            header("Location: ../../../../index.php");
-            exit;
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
         }
 
-        $time_logout = date('H:i:s');
+        header("Location: ../../../../index.php");
+        exit;
+    }
 
-        $check_query = "
-            SELECT *
-            FROM time
+    $check_query = "
+        SELECT *
+        FROM time
+        WHERE user_id = $user_id
+        AND tanggal = '$tanggal'
+        AND time_off_id IS NULL
+        LIMIT 1
+    ";
+
+    $check_result = mysqli_query($koneksi, $check_query);
+
+    if ($check_result && mysqli_num_rows($check_result) > 0) {
+
+        $update_query = "
+            UPDATE time
+            SET
+                time_logout = '$time_logout',
+                geotagging_logout = '$geotagging'
             WHERE user_id = $user_id
             AND tanggal = '$tanggal'
             AND time_off_id IS NULL
         ";
-        $check_result = mysqli_query($koneksi, $check_query);
 
-        if ($check_result && mysqli_num_rows($check_result) > 0) {
-            $update_query = "
-                UPDATE time
-                SET
-                    time_logout = '$time_logout',
-                    geotagging_logout = '$geotagging'
-                WHERE user_id = $user_id
-                AND tanggal = '$tanggal'
-                AND time_off_id IS NULL
-            ";
+        mysqli_query($koneksi, $update_query);
 
-            mysqli_query($koneksi, $update_query);
-        } else {
-            $insert_query = "
-                INSERT INTO time (
-                    tanggal,
-                    user_id,
-                    time_login,
-                    time_logout,
-                    geotagging_logout,
-                    geotagging
-                )
-                VALUES (
-                    '$tanggal',
-                    $user_id,
-                    '00:00:00',
-                    '$time_logout',
-                    '$geotagging',
-                    ''
-                )
-            ";
+    } else {
 
-            mysqli_query($koneksi, $insert_query);
-        }
+        $insert_query = "
+            INSERT INTO time (
+                tanggal,
+                user_id,
+                time_login,
+                time_logout,
+                geotagging_logout,
+                geotagging
+            )
+            VALUES (
+                '$tanggal',
+                $user_id,
+                '00:00:00',
+                '$time_logout',
+                '$geotagging',
+                ''
+            )
+        ";
+
+        mysqli_query($koneksi, $insert_query);
     }
 }
 

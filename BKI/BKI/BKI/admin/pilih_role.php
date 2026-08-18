@@ -15,8 +15,8 @@
     }
 
     if (!isset($_SESSION['roles']) || !is_array($_SESSION['roles']) || count($_SESSION['roles']) <= 1) {
-        if (isset($_SESSION['role']) && $_SESSION['role'] === 'User') {
-            header("Location: pilih_kehadiran.php");
+        if (isset($_SESSION['role']) && $_SESSION['role'] !== '') {
+            header("Location: set_role.php");
         } else {
             header("Location: dashboard.php");
         }
@@ -24,11 +24,7 @@
     }
 
     if (isset($_SESSION['role']) && $_SESSION['role'] !== '') {
-        if ($_SESSION['role'] === 'User') {
-            header("Location: pilih_kehadiran.php");
-        } else {
-            header("Location: dashboard.php");
-        }
+        header("Location: dashboard.php");
         exit;
     }
 
